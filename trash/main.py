@@ -1,9 +1,23 @@
+import sys
+
+import requests
+
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
+import json
+
+
+
+
+def pretty_print_json(data):
+    print(json.dumps(data, indent=4, ensure_ascii=False))
 
 def main():
+
+    sys.stdout.reconfigure(encoding='utf-8')
+    
     # Specify the template file and output folder
-    template_file = './template.xlsx'
+    template_file = 'templates/template.xlsx'
     output_folder = 'Modified_Files'
 
     # Create an instance of the ExcelModifier class
@@ -17,28 +31,25 @@ def main():
         # Dynamic API call example
         endpoint = f"construction/forms/v1/projects/{acc_api.CONTAINER_ID}/forms"
         result = acc_api.call_api(endpoint)
-        print("API Response:", result)
+        data = result['data']
         
-        print("-----------------------------------------------------------------------------------------------")
         
-        endpoint = f"/cost/v1/containers/{acc_api.CONTAINER_ID}/schedule-of-values"
-        result = acc_api.call_api(endpoint)
-        print("API Response:", result)
+        for form in data:
+            if form["formNum"] == 30:
+                pretty_print_json(form)
         
-
-
       
-        # modifier.open_workbook()
-        # 
-        # modifier.modify_cell('E12', 1000000)
-        # modifier.modify_cell('E13', 2501.2501)
-        # modifier.modify_cell('F22', 'Sample Text')
-        # modifier.modify_cell('G31', 420000)
-        # 
-        # modifier.save_workbook()
-        # 
-        # modifier.export_to_pdf()
-        # 
+        divider = "=" * 60
+        
+        
+        
+        
+        
+ 
+        
+        
+        
+
 
     except EnvironmentError as env_err:
         print(f"Environment error: {env_err}")

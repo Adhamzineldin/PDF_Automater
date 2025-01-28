@@ -2,12 +2,18 @@ import os
 from dotenv import load_dotenv
 from urllib.parse import urlencode
 import requests
+import base64
+import re
+import os
+from svgpathtools import svg2paths
+from PIL import Image, ImageDraw
 
 # Load environment variables
 load_dotenv()
 
 class ACCAPI:
     def __init__(self):
+        self.modified_folder = "./Modified_Files"
         self.CLIENT_ID = os.getenv("AUTODESK_CLIENT_ID")
         self.CLIENT_SECRET = os.getenv("AUTODESK_CLIENT_SECRET")
         self.BASE_URL = os.getenv("AUTODESK_API_URL", "https://developer.api.autodesk.com")
@@ -29,7 +35,7 @@ class ACCAPI:
                 "client_id": self.CLIENT_ID,
                 "response_type": "code",
                 "redirect_uri": self.REDIRECT_URI,
-                "scope": "data:read"
+                "scope": "data:read data:write account:read account:write"
         }
         return f"{auth_url}?{urlencode(params)}"
 
@@ -116,6 +122,68 @@ class ACCAPI:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             raise
+    
+    def decode_svg(self, coded_svg_code):
+      
+                
+        # Check if the string looks like base64
+        if re.match(r'^[A-Za-z0-9+/=]+$', coded_svg_code ):
+            print("It looks like a Base64 string. Let's try decoding it.")
+        
+            # Decode the base64 string
+            decoded_bytes = base64.b64decode(coded_svg_code)
+        
+            # Convert the decoded bytes back to string (UTF-8)
+            decoded_svg = decoded_bytes.decode('utf-8')
+        
+            
+            return decoded_svg
+        else:
+            print("This does not appear to be a Base64-encoded string.")
+
+
+
+    def convert_svg_to_png(self, svg_code, output_path):
+        """
+        Converts SVG code to PNG using svgpathtools and Pillow and returns the path to the generated PNG.
+        
+        Parameters:
+        - svg_code: str, SVG code as a string.
+        
+        Returns:
+        - str: Path to the saved PNG file.
+        """
+        try:
+            # Step 1: Save the SVG code to a temporary file
+            temp_svg_path = os.path.join(self.modified_folder, f"{output_path}.svg")
+            with open(temp_svg_path, "w", encoding="utf-8") as svg_file:
+                svg_file.write(svg_code)
+    
+            # Step 2: Parse the SVG to extract paths
+            paths, attributes = svg2paths(temp_svg_path)
+    
+            # Step 3: Create a new blank image (white background)
+            width, height = 600, 300  # You can adjust the size as needed
+            img = Image.new('RGBA', (width, height), (255, 255, 255, 255))  # White background
+            draw = ImageDraw.Draw(img)
+    
+            # Step 4: Draw the paths onto the image
+            for path in paths:
+                for segment in path:
+                    start = segment.start
+                    end = segment.end
+                    draw.line((start.real, start.imag, end.real, end.imag), fill='black', width=2)
+    
+            # Step 5: Save the image as PNG
+            temp_png_path = os.path.join(self.modified_folder, f"{output_path}.png")
+            img.save(temp_png_path, "PNG")
+    
+            # Return the path to the PNG image
+            return temp_png_path
+    
+        except Exception as e:
+            print(f"An error occurred while processing the SVG: {e}")
+            return None
 
     # Dynamic function to call any Autodesk API endpoint and return the unfiltered response
     def call_api(self, endpoint, params=None):
