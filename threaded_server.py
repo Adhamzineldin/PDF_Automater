@@ -1,3 +1,4 @@
+import json
 import re
 import os
 import threading
@@ -6,6 +7,13 @@ from flask import Flask, request, send_file, jsonify
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
+
+
+
+def pretty_print_json(data):
+    print(json.dumps(data, indent=4, ensure_ascii=False))
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -61,23 +69,19 @@ def process_request(data):
         # Add headers and data to the Excel file based on the section
         if section == "Budgets":
             headers = ["Formatted Code", "Unit Price", "Original Amount"]
-            for col, header in enumerate(headers, start=1):
-                excel_modifier.modify_cell(f"{chr(64 + col)}1", header)
+            # for col, header in enumerate(headers, start=1):
+            #     excel_modifier.modify_cell(f"{chr(64 + col)}1", header)
+            
+            pretty_print_json(response)
 
-            for i, budget in enumerate(response, start=2):
-                excel_modifier.modify_cell(f'A{i}', budget['formattedCode'])
-                excel_modifier.modify_cell(f'B{i}', budget['unitPrice'])
-                excel_modifier.modify_cell(f'C{i}', budget['originalAmount'])
+            for i, budget in enumerate(response, start=11):
+                excel_modifier.modify_cell(f'D{i}', budget['unitPrice'])
+                
 
         elif section == "Costs":
-            headers = ["Cost Code", "Type", "Amount"]
-            for col, header in enumerate(headers, start=1):
-                excel_modifier.modify_cell(f"{chr(64 + col)}1", header)
-
-            for i, cost in enumerate(response, start=2):
-                excel_modifier.modify_cell(f'A{i}', cost['code'])
-                excel_modifier.modify_cell(f'B{i}', cost['type'])
-                excel_modifier.modify_cell(f'C{i}', cost['allocatedAmount'])
+            from TEST import print_cost_cover
+            pdf_path = print_cost_cover()
+            return {"pdf_path": pdf_path, "status_code": 200}
 
         elif section == "Forms":
             headers = ["Form Id", "Form Name", "Status"]
@@ -89,8 +93,8 @@ def process_request(data):
                 excel_modifier.modify_cell(f'B{i}', form['name'])
                 excel_modifier.modify_cell(f'C{i}', form['status'])
 
-        excel_modifier.auto_fit_columns()
-        excel_modifier.add_gridlines()
+        # excel_modifier.auto_fit_columns()
+        # excel_modifier.add_gridlines()
 
         # Save Excel file and export to PDF
         excel_modifier.save_workbook(filename='output.xlsx')

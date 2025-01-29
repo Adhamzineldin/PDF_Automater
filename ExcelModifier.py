@@ -23,7 +23,7 @@ class ExcelModifier:
         self.workbook = self.app.books.open(self.excel_path)
         self.sheet = self.workbook.sheets[0]
 
-    def modify_cell(self, cell_range, value, bold=False, font_size=10, align="center"):
+    def modify_cell(self, cell_range, value):
         """Modifies a specific cell range with a new value and optional formatting."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
@@ -31,21 +31,7 @@ class ExcelModifier:
         cell = self.sheet.range(cell_range)
         cell.value = value
     
-        # Apply optional formatting
-        if bold:
-            cell.api.Font.Bold = True
-        cell.api.Font.Size = font_size
-    
-        if align == "center":
-            cell.api.HorizontalAlignment = -4108  # Center alignment in Excel
-        elif align == "right":
-            cell.api.HorizontalAlignment = -4152  # Right alignment in Excel
-        else:
-            cell.api.HorizontalAlignment = -4131  # Left alignment in Excel
-    
-        
-    
-        print(f"Cell {cell_range} updated to {value} with formatting.")
+        print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
         """Automatically adjusts all columns to fit content."""
@@ -76,12 +62,34 @@ class ExcelModifier:
         return save_path
 
     def export_to_pdf(self, filename='modified.pdf'):
-        """Exports the sheet to a PDF."""
+        """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        # Get the ActiveSheet object from the sheet's API
+        sheet_api = self.sheet.api
+    
+        # Set the page setup to fit the sheet to one page
+        sheet_api.PageSetup.FitToPagesWide = 1  # Fit the sheet to one page wide
+        sheet_api.PageSetup.FitToPagesTall = 1  # Fit the sheet to one page tall
+    
+        # Ensure that the sheet does not use zoom and scales automatically
+        sheet_api.PageSetup.Zoom = False  # Disable zoom, let FitToPages take control
+    
+        # Optionally set the print area if necessary (uncomment and adjust if needed)
+        # sheet_api.PageSetup.PrintArea = "A1:Z100"  # Adjust the print area if required
+    
+        # Define the path for saving the PDF
         pdf_path = os.path.join(self.modified_folder, filename)
-        self.sheet.api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
-        print(f"PDF exported at {pdf_path}")
+    
+        # Export as PDF
+        try:
+            sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
+            print(f"PDF exported at {pdf_path}")
+        except Exception as e:
+            print(f"Error exporting to PDF: {e}")
+            return None
+    
         return pdf_path
 
     def close_workbook(self):
