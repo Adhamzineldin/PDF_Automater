@@ -1,8 +1,5 @@
 import json
 from datetime import datetime
-
-from scipy.stats.contingency import association
-
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 
