@@ -147,7 +147,7 @@ def generate_pdf():
 
 
 
-@app.route('/health_check')
+@app.route('/health_check_upstream2')
 def health_check():
     return "Server is up and running!"
 
