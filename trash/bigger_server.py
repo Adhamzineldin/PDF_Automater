@@ -64,7 +64,7 @@ def generate_pdf():
         return {"error": f"Failed to fetch data: {str(e)}"}, 500
 
     # Create and modify the Excel file
-    excel_modifier = ExcelModifier(template_filename="templates/template.xlsx", modified_folder="modified_files")
+    excel_modifier = ExcelModifier(template_filename="../templates/template.xlsx", modified_folder="modified_files")
 
 
     try:

@@ -37,7 +37,7 @@ def generate_pdf():
 
 
     # Create an ExcelModifier instance
-    excel_modifier = ExcelModifier(template_filename="templates/template.xlsx", modified_folder="modified_files")
+    excel_modifier = ExcelModifier(template_filename="../templates/template.xlsx", modified_folder="modified_files")
     
     try:
         # Open the Excel workbook

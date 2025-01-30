@@ -79,8 +79,8 @@ def process_request(data):
                 
 
         elif section == "Costs":
-            from TEST import print_cost_cover
-            pdf_path = print_cost_cover()
+            from sections_functions.cost import print_cost_cover
+            pdf_path = print_cost_cover(project_id)
             return {"pdf_path": pdf_path, "status_code": 200}
 
         elif section == "Forms":
