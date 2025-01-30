@@ -60,6 +60,7 @@ def process_request(data):
         elif section == "Forms":
             response = acc_api.call_api(f"construction/forms/v1/projects/{project_id}/forms")["data"]
     except Exception as e:
+        print(f"Failed to fetch data: {str(e)}")
         return {"error": f"Failed to fetch data: {str(e)}", "status_code": 500}
 
     # Create and modify Excel file based on the section data
@@ -118,6 +119,7 @@ def worker():
                 response = process_request(request_data)
                 response_queue.put(response)
             except Exception as e:
+                print(f"Error processing request: {str(e)}")
                 response_queue.put({"error": str(e), "status_code": 500})
             finally:
                 request_queue.task_done()

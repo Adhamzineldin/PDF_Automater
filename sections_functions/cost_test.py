@@ -81,6 +81,7 @@ def print_cost_cover(project_id):
 
             # Return the generated PDF path
             return pdf_path
-
+        except Exception as e:
+            print(f"Failed to modify Excel file: {str(e)}")
         finally:
             excel_modifier.close_workbook()
