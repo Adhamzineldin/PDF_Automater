@@ -112,14 +112,15 @@ def process_request(data):
 def worker():
     """Background thread that processes requests from the queue."""
     while True:
-        request_data, response_queue = request_queue.get()  # Get a request from the queue
-        try:
-            response = process_request(request_data)
-            response_queue.put(response)  # Send the response back to the main thread
-        except Exception as e:
-            response_queue.put({"error": str(e), "status_code": 500})
-        finally:
-            request_queue.task_done()
+        request_data, response_queue = request_queue.get()
+        with app.app_context():  # Add application context here
+            try:
+                response = process_request(request_data)
+                response_queue.put(response)
+            except Exception as e:
+                response_queue.put({"error": str(e), "status_code": 500})
+            finally:
+                request_queue.task_done()
 
 
 @app.route('/generate-pdf', methods=['POST'])
