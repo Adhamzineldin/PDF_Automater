@@ -140,8 +140,6 @@ class ACCAPI:
         else:
             print("This does not appear to be a Base64-encoded string.")
 
-
-
     def convert_svg_to_png(self, svg_code, output_path):
         """
         Converts SVG code to PNG using svgpathtools and Pillow and returns the path to the generated PNG.

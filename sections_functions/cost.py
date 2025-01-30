@@ -1,8 +1,6 @@
 import json
 from datetime import datetime
 
-from scipy.stats.contingency import association
-
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 
@@ -48,6 +46,7 @@ def print_cost_cover(project_id):
 
             excel_modifier.save_workbook(filename='output.xlsx')
             pdf_path = excel_modifier.export_to_pdf(filename='output.pdf')
+
 
             # Return the generated PDF path
             return pdf_path
