@@ -8,8 +8,12 @@ from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
 
+
+
 def pretty_print_json(data):
     print(json.dumps(data, indent=4, ensure_ascii=False))
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +21,7 @@ CORS(app)
 # Thread-safe queue to store incoming requests
 request_queue = queue.Queue()
 lock = threading.Lock()
+
 
 def process_request(data):
     # Retrieve URL from the data
@@ -64,10 +69,14 @@ def process_request(data):
         # Add headers and data to the Excel file based on the section
         if section == "Budgets":
             headers = ["Formatted Code", "Unit Price", "Original Amount"]
+            # for col, header in enumerate(headers, start=1):
+            #     excel_modifier.modify_cell(f"{chr(64 + col)}1", header)
+            
             pretty_print_json(response)
 
             for i, budget in enumerate(response, start=11):
                 excel_modifier.modify_cell(f'D{i}', budget['unitPrice'])
+                
 
         elif section == "Costs":
             from sections_functions.cost import print_cost_cover
@@ -84,6 +93,10 @@ def process_request(data):
                 excel_modifier.modify_cell(f'B{i}', form['name'])
                 excel_modifier.modify_cell(f'C{i}', form['status'])
 
+        # excel_modifier.auto_fit_columns()
+        # excel_modifier.add_gridlines()
+
+        # Save Excel file and export to PDF
         excel_modifier.save_workbook(filename='output.xlsx')
         pdf_path = excel_modifier.export_to_pdf(filename='output.pdf')
 
@@ -93,6 +106,7 @@ def process_request(data):
     finally:
         excel_modifier.close_workbook()
 
+
 def worker():
     """Background thread that processes requests from the queue."""
     while True:
@@ -101,9 +115,10 @@ def worker():
             response = process_request(request_data)
             response_queue.put(response)  # Send the response back to the main thread
         except Exception as e:
-            response_queue.put({"error": f"Internal error: {str(e)}", "status_code": 500})
+            response_queue.put({"error": str(e), "status_code": 500})
         finally:
             request_queue.task_done()
+
 
 @app.route('/generate-pdf', methods=['POST'])
 def generate_pdf():
@@ -128,17 +143,16 @@ def generate_pdf():
     else:
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
-@app.route('/', methods=['POST'])
-def handle_post_request():
-    # Handle your POST request logic here
-    return jsonify({"message": "POST request received"}), 200
 
-@app.route('/health_check_upstream1', methods=['GET'])
-def health_check_upstream1():
-    return jsonify({"status": "OK", "message": "Service is running smoothly."}), 200
+@app.route('/', methods=['GET'])
+def index():
+    return "Server is running."
+
+
 
 # Start the worker thread
 threading.Thread(target=worker, daemon=True).start()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8550, debug=True)
+
