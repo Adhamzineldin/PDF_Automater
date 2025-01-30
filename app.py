@@ -52,6 +52,7 @@ def process_request(data):
     # Fetch data based on the section
     acc_api = ACCAPI()
     try:
+        print(f"Fetching data for {section} section...")
         if section == "Budgets":
             response = acc_api.call_api(f"cost/v1/containers/{project_id}/budgets")["results"]
         elif section == "Costs":
@@ -79,7 +80,8 @@ def process_request(data):
                 
 
         elif section == "Costs":
-            from sections_functions.cost import print_cost_cover
+            print("Costs section")
+            from sections_functions.cost_test import print_cost_cover
             pdf_path = print_cost_cover(project_id)
             return {"pdf_path": pdf_path, "status_code": 200}
 
@@ -148,4 +150,4 @@ def generate_pdf():
 threading.Thread(target=worker, daemon=True).start()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
