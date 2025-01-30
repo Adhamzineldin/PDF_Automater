@@ -144,6 +144,12 @@ def generate_pdf():
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
 
+@app.route('/', methods=['GET'])
+def index():
+    return "Server is running."
+
+
+
 # Start the worker thread
 threading.Thread(target=worker, daemon=True).start()
 
