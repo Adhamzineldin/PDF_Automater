@@ -57,6 +57,7 @@ def process_request(data):
             response = acc_api.call_api(f"cost/v1/containers/{project_id}/budgets")["results"]
         elif section == "Costs":
             response = acc_api.call_api(f"cost/v1/containers/{project_id}/contracts")["results"]
+            print(response)
         elif section == "Forms":
             response = acc_api.call_api(f"construction/forms/v1/projects/{project_id}/forms")["data"]
     except Exception as e:
