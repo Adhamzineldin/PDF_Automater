@@ -37,7 +37,7 @@ def print_cost_cover(project_id):
                 new_item += float(item["estimated"])
 
 
-        excel_modifier = ExcelModifier(template_filename="templates/template.xlsx", modified_folder="modified_files")
+        excel_modifier = ExcelModifier(template_filename="templates/cost_cover_template.xlsx", modified_folder="modified_files")
         try:
             excel_modifier.open_workbook()
             pretty_print_json(payment)
