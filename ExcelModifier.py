@@ -1,12 +1,8 @@
+import xlwings as xw
 import os
-import subprocess
-from tempfile import NamedTemporaryFile
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
-from openpyxl import load_workbook
-from openpyxl.styles import Border, Side
-from openpyxl.drawing.image import Image as ExcelImage
-from openpyxl.utils import get_column_letter
+
 
 class ExcelModifier:
     def __init__(self, template_filename, modified_folder):
@@ -17,153 +13,136 @@ class ExcelModifier:
         if not os.path.exists(self.modified_folder):
             os.makedirs(self.modified_folder)
 
-        self.wb = load_workbook(self.excel_path)
-        self.sheet = self.wb.active
+        self.app = None
+        self.workbook = None
+        self.sheet = None
+
+    def open_workbook(self):
+        """Opens the Excel workbook and initializes the sheet."""
+        self.app = xw.App(visible=False)
+        self.workbook = self.app.books.open(self.excel_path)
+        self.sheet = self.workbook.sheets[0]
 
     def modify_cell(self, cell_range, value):
-        """Modifies a specific cell with a new value"""
-        self.sheet[cell_range] = value
+        """Modifies a specific cell range with a new value and optional formatting."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        cell = self.sheet.range(cell_range)
+        cell.value = value
+    
         print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
-        """Approximates auto-fit for columns"""
-        for column in self.sheet.columns:
-            max_length = 0
-            column_letter = get_column_letter(column[0].column)
-
-            for cell in column:
-                try:
-                    value_length = len(str(cell.value))
-                    if value_length > max_length:
-                        max_length = value_length
-                except:
-                    pass
-
-            adjusted_width = (max_length + 2) * 1.2
-            self.sheet.column_dimensions[column_letter].width = adjusted_width
-
-        print("Columns adjusted for content.")
-
+        """Automatically adjusts all columns to fit content."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        self.sheet.api.Columns.AutoFit()
+        print("Auto-fit applied to all columns.")
+    
     def add_gridlines(self):
-        """Adds gridlines using cell borders"""
-        thin_border = Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-        )
+        """Adds gridlines to the sheet."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        # Use borders to simulate gridlines
+        for border_id in range(7, 13):  # Borders IDs for Excel
+            self.sheet.api.Cells.Borders(border_id).LineStyle = 1  # xlContinuous
+    
+        print("Gridlines added to the sheet.")
 
-        for row in self.sheet.iter_rows():
-            for cell in row:
-                cell.border = thin_border
-        print("Gridlines added using borders.")
+    def save_workbook(self, filename='modified.xlsx'):
+        """Saves the workbook with a new name."""
+        if self.workbook is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+        save_path = os.path.join(self.modified_folder, filename)
+        self.workbook.save(save_path)
+        print(f"Workbook saved at {save_path}")
+        return save_path
+
+    def export_to_pdf(self, filename='modified.pdf'):
+        """Exports the sheet to a PDF, fitting it to a single page."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        # Get the ActiveSheet object from the sheet's API
+        sheet_api = self.sheet.api
+    
+        # Set the page setup to fit the sheet to one page
+        sheet_api.PageSetup.FitToPagesWide = 1  # Fit the sheet to one page wide
+        sheet_api.PageSetup.FitToPagesTall = 1  # Fit the sheet to one page tall
+    
+        # Ensure that the sheet does not use zoom and scales automatically
+        sheet_api.PageSetup.Zoom = False  # Disable zoom, let FitToPages take control
+    
+        # Optionally set the print area if necessary (uncomment and adjust if needed)
+        # sheet_api.PageSetup.PrintArea = "A1:Z100"  # Adjust the print area if required
+    
+        # Define the path for saving the PDF
+        pdf_path = os.path.join(self.modified_folder, filename)
+    
+        # Export as PDF
+        try:
+            sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
+            print(f"PDF exported at {pdf_path}")
+        except Exception as e:
+            print(f"Error exporting to PDF: {e}")
+            return None
+    
+        return pdf_path
+
+    def close_workbook(self):
+        """Closes the workbook and Excel application."""
+        if self.workbook:
+            self.workbook.close()
+        if self.app:
+            self.app.quit()
+
+
+
+
 
     def insert_svg_as_image(self, svg_code, cell_range):
-        """Inserts SVG image converted to PNG into the worksheet"""
+        """
+        Converts SVG code to PNG using svgpathtools and Pillow, and inserts it into the Excel sheet.
+        
+        Parameters:
+        - svg_code: str, SVG code as a string.
+        - cell_range: str, Excel cell range where the image should be inserted.
+        """
         try:
-            # Create temporary files
-            with NamedTemporaryFile(delete=False, suffix='.svg', dir=self.modified_folder) as temp_svg:
-                temp_svg.write(svg_code.encode('utf-8'))
-                temp_svg_path = temp_svg.name
-
-            # Convert SVG to PNG
-            paths, _ = svg2paths(temp_svg_path)
-            img_size = (600, 300)  # Default image size
-            img = Image.new('RGBA', img_size, (255, 255, 255, 0))
+            # Step 1: Save the SVG code to a temporary file
+            temp_svg_path = os.path.join(self.modified_folder, "temp_image.svg")
+            with open(temp_svg_path, "w", encoding="utf-8") as svg_file:
+                svg_file.write(svg_code)
+    
+            # Step 2: Parse the SVG to extract paths
+            paths, attributes = svg2paths(temp_svg_path)
+    
+            # Step 3: Create a new blank image (white background)
+            width, height = 600, 300  # You can adjust the size as needed
+            img = Image.new('RGBA', (width, height), (0, 0, 0, 0))  # Transparent background
             draw = ImageDraw.Draw(img)
-
-            # Scale and draw paths
+    
+            # Step 4: Draw the paths onto the image
             for path in paths:
                 for segment in path:
                     start = segment.start
                     end = segment.end
-                    draw.line(
-                            (start.real, start.imag, end.real, end.imag),
-                            fill='black',
-                            width=2
-                    )
-
-            # Save PNG
-            with NamedTemporaryFile(delete=False, suffix='.png', dir=self.modified_folder) as temp_png:
-                img.save(temp_png.name, "PNG")
-                temp_png_path = temp_png.name
-
-            # Insert into Excel
-            img = ExcelImage(temp_png_path)
-            self.sheet.add_image(img, cell_range)
-            print(f"Image inserted at {cell_range}")
-
-            # Clean up temporary files
-            os.unlink(temp_svg_path)
-            os.unlink(temp_png_path)
-
+                    draw.line((start.real, start.imag, end.real, end.imag), fill='black', width=2)
+    
+            # Step 5: Save the image as PNG
+            temp_png_path = os.path.join(self.modified_folder, "temp_image.png")
+            img.save(temp_png_path, "PNG")
+    
+            # Step 6: Insert the PNG into the Excel sheet
+            self.sheet.pictures.add(temp_png_path,
+                                    left=self.sheet.range(cell_range).left,
+                                    top=self.sheet.range(cell_range).top)
+    
+            print(f"SVG inserted as image at {cell_range}")
         except Exception as e:
-            print(f"Error processing SVG: {str(e)}")
+            print(f"An error occurred while processing the SVG: {e}")
 
-    def save_workbook(self, filename='modified.xlsx'):
-        """Saves the modified workbook"""
-        save_path = os.path.join(self.modified_folder, filename)
-        self.wb.save(save_path)
-        print(f"Workbook saved to {save_path}")
-        return save_path
 
-    def export_to_pdf(self, filename='modified.pdf'):
-        """Converts the Excel file to PDF using LibreOffice"""
-        xlsx_path = self.save_workbook()
-        pdf_path = os.path.join(self.modified_folder, filename)
-
-        try:
-            # Convert using LibreOffice
-            command = [
-                    'libreoffice',
-                    '--headless',
-                    '--convert-to', 'pdf',
-                    '--outdir', self.modified_folder,
-                    xlsx_path
-            ]
-
-            result = subprocess.run(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    check=True
-            )
-
-            print(f"PDF successfully created at {pdf_path}")
-            return pdf_path
-
-        except subprocess.CalledProcessError as e:
-            print(f"PDF conversion failed: {e.stderr.decode()}")
-            return None
-
-    def close_workbook(self):
-        """Closes the workbook (not necessary with openpyxl, but included for compatibility)"""
-        pass
-    
-    def open_workbook(self):
-        # """Opens the workbook"""
-        # self.wb = load_workbook(self.excel_path)
-        # self.sheet = self.wb.active
-        pass
-    
-# Example usage
-if __name__ == "__main__":
-    svg_example = """<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="40" stroke="black" fill="none"/>
-    </svg>"""
-
-    modifier = ExcelModifier('template.xlsx', 'modified')
-
-    # Basic operations
-    modifier.modify_cell('A1', 'Linux-Compatible Report')
-    modifier.modify_cell('B2', 12345)
-    modifier.auto_fit_columns()
-    modifier.add_gridlines()
-
-    # Image insertion
-    modifier.insert_svg_as_image(svg_example, 'C5')
-
-    # Save and export
-    modifier.save_workbook()
-    modifier.export_to_pdf()
-    modifier.close_workbook()

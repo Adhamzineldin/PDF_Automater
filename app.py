@@ -137,8 +137,6 @@ def generate_pdf():
     request_queue.put((data, response_queue))
 
     response = response_queue.get()
-    
-    
 
     # Send the PDF file if processing is successful
     if "pdf_path" in response:
