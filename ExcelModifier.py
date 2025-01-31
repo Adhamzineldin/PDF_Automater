@@ -19,7 +19,7 @@ class ExcelModifier:
 
     def open_workbook(self):
         """Opens the Excel workbook and initializes the sheet."""
-        self.app = xw.App(visible=False)
+        self.app = xw.App(visible=False, add_book=False)
         self.workbook = self.app.books.open(self.excel_path)
         self.sheet = self.workbook.sheets[0]
 
