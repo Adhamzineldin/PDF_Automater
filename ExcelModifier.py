@@ -149,7 +149,7 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice',
                         '--headless',
-                        '--convert-to', 'pdf:calc_pdf_Export:{"FitWidth":{"type":"short","value":1}}',
+                        '--convert-to', 'pdf:calc_pdf_Export:{"FitWidth":{"type":"short","value":1},"FitHeight":{"type":"short","value":1}}',
                         '--outdir', self.modified_folder,
                         temp_xlsx
                 ]
