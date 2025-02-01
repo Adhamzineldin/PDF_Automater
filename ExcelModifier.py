@@ -2,6 +2,8 @@ import os
 import sys
 import subprocess
 import tempfile
+
+from openpyxl.worksheet.properties import PageSetupProperties
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
 
@@ -120,11 +122,15 @@ class ExcelModifier:
         """Modify the Excel file to fit the entire sheet onto a single page."""
         wb = openpyxl.load_workbook(excel_path)
         sheet = wb.active
+
+
+        if sheet.sheet_properties.pageSetUpPr is None:
+            sheet.sheet_properties.pageSetUpPr = PageSetupProperties(fitToPage=True)
     
         # Set print settings to fit on a single page
         sheet.page_setup.fitToWidth = 1
         sheet.page_setup.fitToHeight = 1
-        sheet.page_setup.fitToPage = True
+        
         
     
         wb.save(excel_path)
