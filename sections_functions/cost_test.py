@@ -63,7 +63,7 @@ def print_cost_cover(project_id):
             excel_modifier.open_workbook()
             pretty_print_json(payment)
             if new:
-                excel_modifier.modify_cell("D10", payment["originalAmount"])
+                excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("D13", new_item)
                 excel_modifier.modify_cell("D14", similar_item)
                 excel_modifier.modify_cell("D15", payment["amount"])
@@ -78,7 +78,7 @@ def print_cost_cover(project_id):
                 excel_modifier.modify_cell("F14", similar_item)
                 excel_modifier.modify_cell("F15", payment["amount"])
             else:
-                excel_modifier.modify_cell("D10", payment["originalAmount"])
+                excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("D13", new_item)
                 excel_modifier.modify_cell("D14", similar_item)
                 excel_modifier.modify_cell("D15", payment["amount"])
