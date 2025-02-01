@@ -147,7 +147,11 @@ class ExcelModifier:
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
             
             try:
-                cmd = ['unoconv', '-f', 'pdf', '-o', self.modified_folder, temp_xlsx]
+                cmd = [
+                        'soffice', '--headless', '--convert-to', 'pdf',
+                        '--outdir', self.modified_folder, '--infilter="calc_pdf_Export:FitToPages=1:Scale=20"',
+                        temp_xlsx
+                ]
 
 
 
