@@ -1,9 +1,8 @@
-
+import os
 import sys
 import subprocess
 import tempfile
-import uno
-import os
+
 
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
@@ -146,41 +145,29 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
-
+            
             try:
-                # Start UNO connection
-                local_context = uno.getComponentContext()
-                resolver = local_context.ServiceManager.createInstanceWithContext(
-                        "com.sun.star.bridge.UnoUrlResolver", local_context)
-                context = resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
-                desktop = context.ServiceManager.createInstanceWithContext(
-                        "com.sun.star.frame.Desktop", context)
-        
-                # Open the Excel file
-                file_url = uno.systemPathToFileUrl(os.path.abspath(temp_xlsx))
-                document = desktop.loadComponentFromURL(file_url, "_blank", 0, ())
-        
-                # Access the sheet and set print area to fit content to one page
-                sheets = document.Sheets
-                sheet = sheets.getByIndex(0)  # Adjust index if needed
-                page_setup = sheet.PageSetup
-                page_setup.FitToPagesWide = 1
-                page_setup.FitToPagesTall = 1
-        
-                # Set the export filter (adjust the filter for fitting to one page)
-                pdf_filename = os.path.splitext(os.path.basename(temp_xlsx))[0] + ".pdf"
-                pdf_output_path = os.path.join(self.modified_folder, pdf_filename)
-                pdf_url = uno.systemPathToFileUrl(pdf_output_path)
-        
-                # Export the file as PDF
-                export_filter = "writer_pdf_Export:FitToPagesWide=1:FitToPagesTall=1"
-                document.storeToURL(pdf_url, (uno.createUnoStruct("com.sun.star.beans.PropertyValue", "FilterName", 0, export_filter, 0),))
-        
-                # Close the document after export
-                document.close(True)
-        
-                print(f"PDF exported at {pdf_output_path}")
-                return pdf_output_path
+                cmd = [
+                        'libreoffice', '--headless',
+                        '--convert-to', 'pdf',
+                        '--outdir', self.modified_folder,
+                        temp_xlsx
+                ]
+
+
+
+                subprocess.run(cmd, check=True)
+    
+                # Ensure that the generated PDF has the same name as the input XLSX file.
+                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+    
+                # If the output file already exists, delete it to avoid conflicts.
+                if os.path.exists(pdf_path):
+                    os.remove(pdf_path)
+    
+                # Rename the generated PDF to the desired filename (overwrite if exists).
+                os.rename(generated_pdf, pdf_path)
+                print(f"PDF exported at {pdf_path}")
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
