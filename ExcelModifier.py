@@ -120,10 +120,11 @@ class ExcelModifier:
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-
+    
         pdf_path = os.path.join(self.modified_folder, filename)
-
+    
         if self.backend == 'xlwings':
+            # Windows-specific export using xlwings (unchanged)
             sheet_api = self.sheet.api
             sheet_api.PageSetup.FitToPagesWide = 1  # Fit to one page wide
             sheet_api.PageSetup.FitToPagesTall = 1   # Fit to one page tall
@@ -136,7 +137,6 @@ class ExcelModifier:
                 return None
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
-            # First, ensure the workbook is saved.
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
             try:
                 cmd = [
@@ -144,18 +144,23 @@ class ExcelModifier:
                         'pdf:calc_pdf_Export', '--outdir', self.modified_folder, temp_xlsx
                 ]
                 subprocess.run(cmd, check=True)
-                # LibreOffice names the PDF with the same basename as the XLSX.
+    
+                # Ensure that the generated PDF has the same name as the input XLSX file.
                 generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
-                # Rename/move it to the desired filename.
-                pdf_path = generated_pdf
-                # os.remove(pdf_path)
-                # os.rename(generated_pdf, pdf_path)
+    
+                # If the output file already exists, delete it to avoid conflicts.
+                if os.path.exists(pdf_path):
+                    os.remove(pdf_path)
+    
+                # Rename the generated PDF to the desired filename (overwrite if exists).
+                os.rename(generated_pdf, pdf_path)
                 print(f"PDF exported at {pdf_path}")
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
+    
         return pdf_path
-
+    
     def insert_svg_as_image(self, svg_code, cell_range):
         """
         Converts SVG code to PNG using svgpathtools and Pillow, and inserts it into the Excel sheet.
