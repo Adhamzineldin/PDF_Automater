@@ -157,8 +157,7 @@ class ExcelModifier:
             self.fit_excel_to_page(temp_xlsx)
             try:
                 cmd = [
-                        'libreoffice', '--headless', '--convert-to',
-                        'pdf:calc_pdf_Export:PaperSize=A4,ReduceArea=1,Scale=100,Fittopage=1',
+                        'libreoffice', '--headless', '--convert-to', 'pdf',
                         '--outdir', self.modified_folder, temp_xlsx
                 ]
 
