@@ -141,8 +141,9 @@ class ExcelModifier:
             try:
                 cmd = [
                         'libreoffice', '--headless', '--convert-to',
-                        'pdf:calc_pdf_Export', '--outdir', self.modified_folder, temp_xlsx
+                        'pdf:calc_pdf_Export:FitToPages=1', '--outdir', self.modified_folder, temp_xlsx
                 ]
+
                 subprocess.run(cmd, check=True)
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
