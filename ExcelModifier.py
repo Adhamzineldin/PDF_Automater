@@ -118,22 +118,7 @@ class ExcelModifier:
         print(f"Workbook saved at {save_path}")
         return save_path
 
-    def fit_excel_to_page(self, excel_path):
-        """Modify the Excel file to fit the entire sheet onto a single page."""
-        wb = openpyxl.load_workbook(excel_path)
-        sheet = wb.active
 
-
-        if sheet.sheet_properties.pageSetUpPr is None:
-            sheet.sheet_properties.pageSetUpPr = PageSetupProperties(fitToPage=True)
-    
-        # Set print settings to fit on a single page
-        sheet.page_setup.fitToWidth = 1
-        sheet.page_setup.fitToHeight = 1
-        
-        
-    
-        wb.save(excel_path)
 
 
 
@@ -159,11 +144,15 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
-            self.fit_excel_to_page(temp_xlsx)
+            
             try:
                 cmd = [
-                        'libreoffice', '--headless', '--convert-to', 'pdf',
-                        '--outdir', self.modified_folder, temp_xlsx
+                        'libreoffice',
+                        '--headless',
+                        '--convert-to',
+                        'pdf:calc_pdf_Export:{"SinglePageSheets":{"type":"boolean","value":"true"}}',
+                        '--outdir', self.modified_folder,
+                        temp_xlsx
                 ]
 
                 subprocess.run(cmd, check=True)
