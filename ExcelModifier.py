@@ -147,10 +147,8 @@ class ExcelModifier:
             
             try:
                 cmd = [
-                        'libreoffice', '--headless',
-                        '--convert-to',
-                        '--outdir', self.modified_folder,
-                        temp_xlsx
+                        'libreoffice', '--headless', '--convert-to', 'pdf',
+                        '--outdir', self.modified_folder, temp_xlsx
                 ]
 
 
