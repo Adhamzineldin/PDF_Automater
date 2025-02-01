@@ -42,9 +42,11 @@ def print_cost_cover(project_id):
         new_item = 0
         for item in items:
             if item["name"] == "Block Work":
-                similar_item += float(item["estimated"])
+                if item["estimated"]:
+                    similar_item += float(item["estimated"])
             else:
-                new_item += float(item["estimated"])
+                if item["estimated"]:
+                    new_item += float(item["estimated"])
 
         # Determine the template path based on association ID
         template_filename = f"{payment_number}.xlsx"
