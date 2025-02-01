@@ -148,7 +148,7 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice', '--headless',
                         '--convert-to', 'pdf:calc_pdf_Export:{"FitToPagesWide":1,"FitToPagesTall":1,"Quality":100,"SelectPdfVersion":0,"PDFUACompliance":false,"UseTaggedPDF":false,"ExportFormFields":true,"ExportBookmarks":true,"ExportNotes":false,"ExportNotesPages":false,"ExportOnlyNotesPages":false,"ExportNotesInMargin":false,"ExportHiddenSlides":false,"IsSkipEmptyPages":false,"EmbedStandardFonts":false,"IsAddStream":false,"Watermark":"","WatermarkColor":8388223,"WatermarkFontHeight":0,"WatermarkRotateAngle":0,"WatermarkFontName":"Helvetica","TiledWatermark":""}',
-                        '--outdir', modified_folder,
+                        '--outdir', self.modified_folder,
                         temp_xlsx
                 ]
 
