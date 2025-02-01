@@ -124,6 +124,8 @@ class ExcelModifier:
         # Set print settings to fit on a single page
         sheet.page_setup.fitToWidth = 1
         sheet.page_setup.fitToHeight = 1
+        sheet.page_setup.fitToPage = True
+        
     
         wb.save(excel_path)
 
