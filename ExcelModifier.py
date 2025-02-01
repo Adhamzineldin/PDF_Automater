@@ -149,7 +149,7 @@ class ExcelModifier:
             try:
                 cmd = [
                         'soffice', '--headless', '--convert-to', 'pdf',
-                        '--outdir', self.modified_folder, '--infilter="calc_pdf_Export:FitToPages=1:Scale=100"',
+                        '--outdir', self.modified_folder, '--infilter="calc_pdf_Export:FitToPages=1:Scale=20"',
                         temp_xlsx
                 ]
 
