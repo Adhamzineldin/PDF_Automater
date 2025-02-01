@@ -149,11 +149,11 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice',
                         '--headless',
-                        '--convert-to',
-                        'pdf:calc_pdf_Export:{"SinglePageSheets":{"type":"boolean","value":"true"}}',
+                        '--convert-to', 'pdf:calc_pdf_Export:{"SinglePageSheets":{"type":"boolean","value":"true"}}',
                         '--outdir', self.modified_folder,
                         temp_xlsx
                 ]
+
 
                 subprocess.run(cmd, check=True)
     
