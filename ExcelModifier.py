@@ -141,7 +141,8 @@ class ExcelModifier:
             try:
                 cmd = [
                         'libreoffice', '--headless', '--convert-to',
-                        'pdf:calc_pdf_Export:FitToPages=1', '--outdir', self.modified_folder, temp_xlsx
+                        'pdf:calc_pdf_Export:PaperSize=A4,ReduceArea=1,Scale=100,Fittopage=1',
+                        '--outdir', self.modified_folder, temp_xlsx
                 ]
 
                 subprocess.run(cmd, check=True)
