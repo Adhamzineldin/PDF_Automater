@@ -66,7 +66,7 @@ def process_request(data):
     # Create and modify Excel file based on the section data
     excel_modifier = ExcelModifier(template_filename="templates/template.xlsx", modified_folder="modified_files")
     try:
-        
+        excel_modifier.open_workbook()
 
         # Add headers and data to the Excel file based on the section
         if section == "Budgets":
@@ -107,7 +107,7 @@ def process_request(data):
         return {"pdf_path": pdf_path, "status_code": 200}
 
     finally:
-        pass
+        excel_modifier.close_workbook()
 
 
 def worker():

@@ -108,6 +108,7 @@ class ExcelModifier:
         """Saves the workbook with a new name."""
         if self.workbook is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
+        print(f"file name {filename}")
         save_path = os.path.join(self.modified_folder, filename)
         if self.backend == 'xlwings':
             self.workbook.save(save_path)
