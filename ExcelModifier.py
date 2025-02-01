@@ -2,8 +2,6 @@ import os
 import sys
 import subprocess
 import tempfile
-
-from openpyxl.worksheet.properties import PageSetupProperties
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
 
@@ -16,6 +14,7 @@ else:
     import openpyxl
     from openpyxl.utils import get_column_letter
     from openpyxl.drawing.image import Image as XLImage
+    from openpyxl.worksheet.properties import PageSetupProperties
 
 
 class ExcelModifier:
@@ -118,7 +117,7 @@ class ExcelModifier:
         print(f"Workbook saved at {save_path}")
         return save_path
 
-
+  
 
 
 
