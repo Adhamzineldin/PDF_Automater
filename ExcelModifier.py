@@ -137,7 +137,7 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             # First, ensure the workbook is saved.
-            # temp_xlsx = self.save_workbook(filename='temp_for_pdf.xlsx')
+            temp_xlsx = "output.xlsx"
             try:
                 cmd = [
                         'libreoffice', '--headless', '--convert-to',
@@ -145,7 +145,7 @@ class ExcelModifier:
                 ]
                 subprocess.run(cmd, check=True)
                 # LibreOffice names the PDF with the same basename as the XLSX.
-                generated_pdf = os.path.join(self.modified_folder, 'temp_for_pdf.pdf')
+                generated_pdf = os.path.join(self.modified_folder, 'output.pdf')
                 # Rename/move it to the desired filename.
                 os.rename(generated_pdf, pdf_path)
                 print(f"PDF exported at {pdf_path}")
