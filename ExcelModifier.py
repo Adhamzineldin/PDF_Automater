@@ -147,8 +147,10 @@ class ExcelModifier:
             
             try:
                 cmd = [
-                        'libreoffice', '--headless', '--convert-to', 'pdf',
-                        '--outdir', self.modified_folder, temp_xlsx
+                        'libreoffice', '--headless',
+                        '--convert-to', 'pdf:calc_pdf_Export:FitToPagesWide=1:FitToPagesTall=1',
+                        '--outdir', self.modified_folder,
+                        temp_xlsx
                 ]
 
 
