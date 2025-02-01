@@ -137,7 +137,7 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             # First, ensure the workbook is saved.
-            temp_xlsx = f"{excel_filename}.xlsx"
+            temp_xlsx = f"modified_files/{excel_filename}.xlsx"
             try:
                 cmd = [
                         'libreoffice', '--headless', '--convert-to',
