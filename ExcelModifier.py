@@ -116,7 +116,7 @@ class ExcelModifier:
         print(f"Workbook saved at {save_path}")
         return save_path
 
-    def export_to_pdf(self, filename='modified.pdf'):
+    def export_to_pdf(self, filename='modified.pdf', excel_filename="output"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
@@ -137,7 +137,7 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             # First, ensure the workbook is saved.
-            temp_xlsx = "output.xlsx"
+            temp_xlsx = f"{excel_filename}.xlsx"
             try:
                 cmd = [
                         'libreoffice', '--headless', '--convert-to',

@@ -86,7 +86,7 @@ def print_cost_cover(project_id):
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
-            pdf_path = excel_modifier.export_to_pdf(filename='output.pdf')
+            pdf_path = excel_modifier.export_to_pdf(filename='output.pdf', excel_filename=payment_number)
 
             # Return the generated PDF path
             return pdf_path
