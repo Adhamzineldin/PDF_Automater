@@ -145,7 +145,7 @@ class ExcelModifier:
                 ]
                 subprocess.run(cmd, check=True)
                 # LibreOffice names the PDF with the same basename as the XLSX.
-                generated_pdf = os.path.join(self.modified_folder, f'output.pdf')
+                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
                 # Rename/move it to the desired filename.
                 os.remove(pdf_path)
                 os.rename(generated_pdf, pdf_path)
