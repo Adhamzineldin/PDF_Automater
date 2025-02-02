@@ -207,6 +207,11 @@ class ACCAPI:
         adham_server_dir = os.path.dirname(new_pdf_path)
         if not os.path.exists(adham_server_dir):
             os.makedirs(adham_server_dir)
+            # Change the current working directory to the folder containing the PDF
+            os.chdir(project_files_dir)
+    
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
             print(f"Directory {adham_server_dir} created.")
     
         # If the output file already exists, delete it to avoid conflicts
@@ -217,7 +222,7 @@ class ACCAPI:
         subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
     
         # Change the current working directory to the folder containing the PDF
-        os.chdir(project_files_dir)
+        os.chdir(adham_server_dir)
     
         # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
         subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
