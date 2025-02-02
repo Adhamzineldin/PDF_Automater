@@ -186,7 +186,7 @@ class ExcelModifier:
                 os.chdir(new_pdf_path)
 
                 # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
-                subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+                # subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
             
                 print(f"PDF also exported at {new_pdf_path}")
                 
