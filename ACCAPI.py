@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 from dotenv import load_dotenv
 from urllib.parse import urlencode
@@ -212,6 +213,7 @@ class ACCAPI:
     
             # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
             subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+            time.sleep(5)
             print(f"Directory {adham_server_dir} created.")
     
         # If the output file already exists, delete it to avoid conflicts
