@@ -133,7 +133,7 @@ class ExcelModifier:
 
         name = None
         if payment["number"]:
-            name = f'{payment["number"]}_{payment["status"]}'
+            name = f'{payment["number"]}_{payment["status"]}.pdf'
         else:
             name = excel_filename
     
