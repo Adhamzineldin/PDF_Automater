@@ -168,6 +168,20 @@ class ExcelModifier:
                 # Rename the generated PDF to the desired filename (overwrite if exists).
                 os.rename(generated_pdf, pdf_path)
                 print(f"PDF exported at {pdf_path}")
+
+                pdf_path_new = os.path.expanduser(f"~/server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf")
+
+                if os.path.exists(pdf_path_new):
+                    os.remove(pdf_path_new)
+            
+                # Copy the file to the new location
+                os.rename(generated_pdf, pdf_path_new)
+                print(f"PDF also exported at {pdf_path_new}")
+                
+                
+                
+                
+                
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
