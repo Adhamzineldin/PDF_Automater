@@ -177,16 +177,16 @@ class ExcelModifier:
                 if os.path.exists(new_pdf_path):
                     os.remove(new_pdf_path)
             
-                linux_path = f"~/{pdf_path}"
+                linux_path = f"~/{new_pdf_path}"
                 # Use the 'cp' command to copy the generated PDF to the new location
                 subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
 
 
                 # Change the current working directory to the folder containing the PDF
-                os.chdir(new_pdf_path)
+                os.chdir(linux_path)
 
                 # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
-                # subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+                subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
             
                 print(f"PDF also exported at {new_pdf_path}")
                 
