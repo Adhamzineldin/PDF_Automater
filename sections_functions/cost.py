@@ -67,29 +67,31 @@ def print_cost_cover(project_id):
                 excel_modifier.modify_cell("D13", new_item)
                 excel_modifier.modify_cell("D14", similar_item)
                 excel_modifier.modify_cell("D15", float(payment["amount"]))
+                payment["status"] = "Main-Contractor"
             elif payment["status"] == "revise" or payment["status"] == "inReview":
                 excel_modifier.modify_cell("E10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("E13", new_item)
                 excel_modifier.modify_cell("E14", similar_item)
                 excel_modifier.modify_cell("E15", float(payment["amount"]))
+                payment["status"] = "Consultant"
             elif payment["status"] == "accepted" or payment["status"] == "approved":
                 excel_modifier.modify_cell("F10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("F13", new_item)
                 excel_modifier.modify_cell("F14", similar_item)
                 excel_modifier.modify_cell("F15", float(payment["amount"]))
+                payment["status"] = "Owner"
             else:
                 excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("D13", new_item)
                 excel_modifier.modify_cell("D14", similar_item)
                 excel_modifier.modify_cell("D15", float(payment["amount"]))
-                
-                
+                payment["status"] = "Main-Contractor"
             
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
             project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
-            pdf_path = excel_modifier.export_to_pdf(filename='output.pdf', excel_filename=payment_number, project_name=project["name"])
+            pdf_path = excel_modifier.export_to_pdf(payment, filename='output.pdf', excel_filename=payment_number, project_name=project["name"])
 
             # Return the generated PDF path
             return pdf_path

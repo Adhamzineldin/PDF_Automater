@@ -125,12 +125,19 @@ class ExcelModifier:
 
 
 
-    def export_to_pdf(self, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Adhams_Server"):
+    def export_to_pdf(self, payment, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Adhams_Server"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
+
+
+        name = None
+        if payment["number"]:
+            name = f'{payment["number"]-payment["status"]}'
+        else:
+            name = excel_filename
     
-        pdf_path = os.path.join(self.modified_folder, filename)
+        pdf_path = os.path.join(self.modified_folder, name)
     
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
@@ -163,7 +170,7 @@ class ExcelModifier:
                 subprocess.run(cmd, check=True)
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
-                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+                generated_pdf = os.path.join(self.modified_folder, f'{name}.pdf')
     
                 # If the output file already exists, delete it to avoid conflicts.
                 if os.path.exists(pdf_path):
@@ -175,7 +182,10 @@ class ExcelModifier:
 
 
                 acc_api = ACCAPI()
-                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, excel_filename=excel_filename, project_name=project_name, folder_name=destination_folder)
+                
+                
+            
+                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
                 
                 
                 
