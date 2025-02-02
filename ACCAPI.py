@@ -203,6 +203,7 @@ class ACCAPI:
         original_dir = os.getcwd()
     
         # Ensure the target directory exists, if not, create it
+        project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files')
         adham_server_dir = os.path.dirname(new_pdf_path)
         if not os.path.exists(adham_server_dir):
             os.makedirs(adham_server_dir)
@@ -216,7 +217,7 @@ class ACCAPI:
         subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
     
         # Change the current working directory to the folder containing the PDF
-        os.chdir(adham_server_dir)
+        os.chdir(project_files_dir)
     
         # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
         subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
