@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 import subprocess
 import tempfile
@@ -170,15 +169,18 @@ class ExcelModifier:
                 os.rename(generated_pdf, pdf_path)
                 print(f"PDF exported at {pdf_path}")
 
-                pdf_path_new = os.path.expanduser(f"~/server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf")
 
-                if os.path.exists(pdf_path_new):
-                    os.remove(pdf_path_new)
 
-                # Copy the file to the new location
-                shutil.copy(generated_pdf, pdf_path_new)
-                print(f"PDF also exported at {pdf_path_new}")
+                new_pdf_path = os.path.expanduser(f'~/server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf')
 
+                # If the output file already exists, delete it to avoid conflicts
+                if os.path.exists(new_pdf_path):
+                    os.remove(new_pdf_path)
+            
+                # Use the 'cp' command to copy the generated PDF to the new location
+                subprocess.run(['cp', generated_pdf, new_pdf_path], check=True)
+            
+                print(f"PDF also exported at {new_pdf_path}")
                 
                 
                 
