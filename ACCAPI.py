@@ -1,3 +1,5 @@
+import subprocess
+
 from dotenv import load_dotenv
 from urllib.parse import urlencode
 import requests
@@ -181,6 +183,49 @@ class ACCAPI:
         except Exception as e:
             print(f"An error occurred while processing the SVG: {e}")
             return None
+
+    def export_pdf_to_odrive(self, pdf_path, excel_filename):
+        """
+        Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
+    
+        :param pdf_path: The path to the generated PDF.
+        :param excel_filename: The filename to save the PDF as (without extension).
+        """
+        # Get the user's home directory path
+        home_dir = os.path.expanduser("~")
+    
+        # Define the new PDF path
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf')
+    
+        # Save the current working directory to return to it later
+        original_dir = os.getcwd()
+    
+        # Ensure the target directory exists, if not, create it
+        adham_server_dir = os.path.dirname(new_pdf_path)
+        if not os.path.exists(adham_server_dir):
+            os.makedirs(adham_server_dir)
+            print(f"Directory {adham_server_dir} created.")
+    
+        # If the output file already exists, delete it to avoid conflicts
+        if os.path.exists(new_pdf_path):
+            os.remove(new_pdf_path)
+    
+        # Use the 'cp' command to copy the generated PDF to the new location
+        subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
+    
+        # Change the current working directory to the folder containing the PDF
+        os.chdir(adham_server_dir)
+    
+        # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+        subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+    
+        print(f"PDF also exported at {new_pdf_path}")
+    
+        # Change back to the original working directory
+        os.chdir(original_dir)
+        print(f"Changed back to the original working directory: {original_dir}")
+        
+        
 
     # Dynamic function to call any Autodesk API endpoint and return the unfiltered response
     def call_api(self, endpoint, params=None):

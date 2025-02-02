@@ -7,6 +7,8 @@ import tempfile
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
 
+from ACCAPI import ACCAPI
+
 # Decide which backend to use based on the OS.
 USE_XLWINGS = sys.platform.startswith('win')
 
@@ -172,29 +174,8 @@ class ExcelModifier:
                 print(f"PDF exported at {pdf_path}")
 
 
-
-                new_pdf_path = os.path.expanduser(f'~/server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf')
-
-                # If the output file already exists, delete it to avoid conflicts
-                if os.path.exists(new_pdf_path):
-                    os.remove(new_pdf_path)
-            
-        
-                # Use the 'cp' command to copy the generated PDF to the new location
-                subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
-
-
-                # Change the current working directory to the folder containing the PDF
-                os.chdir( os.path.expanduser(f'~/server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server'))
-
-                # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
-                subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
-            
-                print(f"PDF also exported at {new_pdf_path}")
-
-                # Change back to the original working directory
-                os.chdir(original_dir)
-                print(f"Changed back to the original working directory: {original_dir}")
+                acc_api = ACCAPI()
+                acc_api.export_pdf_to_odrive(pdf_path=pdf_path, excel_filename=excel_filename)
                 
                 
                 
