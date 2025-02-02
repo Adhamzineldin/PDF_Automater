@@ -211,9 +211,9 @@ class ACCAPI:
             print(f"Directory {adham_server_dir} created.")
 
             # Change the current working directory to the folder containing the PDF
-            os.chdir(project_files_dir)
+            os.chdir(f'server/odrive/Autodesk/Square Engineering Firm')
             # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
-            find_command = f"find . -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;"
+            find_command = f"find {project_files_dir} -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;"
             # subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
             subprocess.run(find_command, shell=True, check=True)
             
