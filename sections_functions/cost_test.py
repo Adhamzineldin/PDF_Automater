@@ -84,10 +84,11 @@ def print_cost_cover(project_id):
                 excel_modifier.modify_cell("D15", float(payment["amount"]))
                 
                 
-                
+            
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
+            project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
             pdf_path = excel_modifier.export_to_pdf(filename='output.pdf', excel_filename=payment_number)
 
             # Return the generated PDF path

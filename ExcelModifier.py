@@ -125,7 +125,7 @@ class ExcelModifier:
 
 
 
-    def export_to_pdf(self, filename='modified.pdf', excel_filename="output"):
+    def export_to_pdf(self, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Adhams_Server"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
@@ -175,7 +175,7 @@ class ExcelModifier:
 
 
                 acc_api = ACCAPI()
-                acc_api.export_pdf_to_odrive(pdf_path=pdf_path, excel_filename=excel_filename)
+                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, excel_filename=excel_filename, project_name=project_name, folder_name=destination_folder)
                 
                 
                 

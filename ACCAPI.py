@@ -184,10 +184,12 @@ class ACCAPI:
             print(f"An error occurred while processing the SVG: {e}")
             return None
 
-    def export_pdf_to_odrive(self, pdf_path, excel_filename):
+    def upload_pdf_to_acc(self, pdf_path, excel_filename, project_name="Information Systems Workspace", folder_name="Adhams_Server"):
         """
         Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
     
+        :param project_name: 
+        :param folder_name: 
         :param pdf_path: The path to the generated PDF.
         :param excel_filename: The filename to save the PDF as (without extension).
         """
@@ -195,7 +197,7 @@ class ACCAPI:
         home_dir = os.path.expanduser("~")
     
         # Define the new PDF path
-        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/Information Systems Workspace/Project Files/Adhams_Server/{excel_filename}.pdf')
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{excel_filename}.pdf')
     
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
