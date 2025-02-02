@@ -133,10 +133,10 @@ class ExcelModifier:
 
         name = None
         if payment["number"]:
-            name = f'{payment["number"]}_{payment["status"]}.pdf'
+            name = f'{payment["number"]}_{payment["status"]}'
             print(name)
         else:
-            name = f"{excel_filename}.pdf"
+            name = f"{excel_filename}"
             print(name)
     
         pdf_path = os.path.join(self.modified_folder, name)
