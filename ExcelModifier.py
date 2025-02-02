@@ -134,10 +134,13 @@ class ExcelModifier:
         name = None
         if payment["number"]:
             name = f'{payment["number"]}_{payment["status"]}.pdf'
+            print(name)
         else:
             name = f"{excel_filename}.pdf"
+            print(name)
     
         pdf_path = os.path.join(self.modified_folder, name)
+        print(pdf_path)
     
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
@@ -171,6 +174,7 @@ class ExcelModifier:
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
                 generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+                print(generated_pdf)
     
                 # If the output file already exists, delete it to avoid conflicts.
                 if os.path.exists(pdf_path):
