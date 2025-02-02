@@ -170,7 +170,7 @@ class ExcelModifier:
                 subprocess.run(cmd, check=True)
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
-                generated_pdf = os.path.join(self.modified_folder, f'{name}.pdf')
+                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
     
                 # If the output file already exists, delete it to avoid conflicts.
                 if os.path.exists(pdf_path):
