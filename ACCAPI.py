@@ -198,7 +198,7 @@ class ACCAPI:
         home_dir = os.path.expanduser("~")
     
         # Define the new PDF path
-        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename}.pdf')
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename.split('_')[0]}/{filename}.pdf')
     
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
