@@ -145,6 +145,8 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
+            # Capture the current working directory
+            original_dir = os.getcwd()
             
             try:
                 cmd = [
@@ -189,6 +191,10 @@ class ExcelModifier:
                 subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
             
                 print(f"PDF also exported at {new_pdf_path}")
+
+                # Change back to the original working directory
+                os.chdir(original_dir)
+                print(f"Changed back to the original working directory: {original_dir}")
                 
                 
                 
