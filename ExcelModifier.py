@@ -177,7 +177,7 @@ class ExcelModifier:
                 if os.path.exists(new_pdf_path):
                     os.remove(new_pdf_path)
             
-                linux_path = f"~/{new_pdf_path}"
+                linux_path = f"~{new_pdf_path}"
                 # Use the 'cp' command to copy the generated PDF to the new location
                 subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
 
