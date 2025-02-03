@@ -226,6 +226,7 @@ class ACCAPI:
             time.sleep(5)    
         elif not os.path.exists(adham_server_dir):
             print("Syncing Adham Server directory...")
+            print(f"Directory {adham_server_dir} does not exist. Creating it now...")
             os.makedirs(adham_server_dir)
             print(f"Directory {adham_server_dir} created.")
 
