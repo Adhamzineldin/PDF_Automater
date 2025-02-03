@@ -208,6 +208,7 @@ class ACCAPI:
         adham_server_dir = os.path.dirname(new_pdf_path)
         
         if not os.path.exists(project_files_dir):
+            print("Syncing Project Files directory...")
             os.makedirs(adham_server_dir)
             print(f"Directory {adham_server_dir} created.")
 
@@ -224,6 +225,7 @@ class ACCAPI:
 
             time.sleep(5)    
         elif not os.path.exists(adham_server_dir):
+            print("Syncing Adham Server directory...")
             os.makedirs(adham_server_dir)
             print(f"Directory {adham_server_dir} created.")
 
