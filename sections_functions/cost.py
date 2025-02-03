@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
@@ -14,16 +15,16 @@ def extract_cost_id(url):
     # Parse the URL
     parsed_url = urlparse(url)
 
-    # Check if 'preview=' exists in the query parameters
+    # Check if 'preview' exists in the query parameters
     query_params = parse_qs(parsed_url.query)
     if 'preview' in query_params:
         return query_params['preview'][0]
 
-    # If no preview, split the path by '/' and get the last segment
-    path_segments = parsed_url.path.strip("/").split("/")
+    # Extract the last UUID from the path using regex
+    match = re.search(r'([a-f0-9-]{36})$', parsed_url.path)
 
-    # The last segment is the cost ID
-    return path_segments[-1] if path_segments else None
+    # If no match is found, return None
+    return match.group(1) if match else None
 
 
 def print_cost_cover(project_id, url):
