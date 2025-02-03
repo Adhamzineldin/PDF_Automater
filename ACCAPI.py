@@ -207,12 +207,7 @@ class ACCAPI:
         project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
         adham_server_dir = os.path.dirname(new_pdf_path)
         
-        # if not os.path.exists(project_files_dir):
-        #     os.makedirs(project_files_dir)
-        #     print(f"Directory {project_files_dir} created.")
-        
-        
-        if not os.path.exists(adham_server_dir):
+        if not os.path.exists(project_files_dir):
             os.makedirs(adham_server_dir)
             print(f"Directory {adham_server_dir} created.")
 
@@ -222,6 +217,17 @@ class ACCAPI:
             subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
 
             os.chdir(project_files_dir)
+
+            find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)    
+        elif not os.path.exists(adham_server_dir):
+            os.makedirs(adham_server_dir)
+            print(f"Directory {adham_server_dir} created.")
+
+            os.chdir(adham_server_dir)
             
             find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
             
