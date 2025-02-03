@@ -200,6 +200,9 @@ class ACCAPI:
         # Define the new PDF path
         new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename.split('_')[0]}/{filename}.pdf')
     
+    
+        server_folder_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}')
+    
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
     
@@ -226,13 +229,10 @@ class ACCAPI:
             time.sleep(5)    
         elif not os.path.exists(adham_server_dir):
             print("Syncing Adham Server directory...")
-            print(f"Directory {adham_server_dir} does not exist. Creating it now...")
-            os.makedirs(adham_server_dir)
-            print(f"Directory {adham_server_dir} created.")
-
-            os.chdir(adham_server_dir)
             
-            find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+            os.makedirs(adham_server_dir)
+            
+            find_command = f'find "{server_folder_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
             
             subprocess.run(find_command, shell=True, check=True)
             
