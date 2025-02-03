@@ -19,12 +19,17 @@ def extract_cost_id(url):
     query_params = parse_qs(parsed_url.query)
     if 'preview' in query_params:
         return query_params['preview'][0]
+    elif 'selectId' in query_params:
+        return query_params['selectId'][0]
 
-    # Extract the last UUID from the path using regex
-    match = re.search(r'([a-f0-9-]{36})$', parsed_url.path)
+    # Extract the last segment of the path
+    last_segment = parsed_url.path.rstrip('/').split('/')[-1]
 
-    # If no match is found, return None
-    return match.group(1) if match else None
+    # Validate if it's a UUID
+    if re.fullmatch(r'[a-f0-9-]{36}', last_segment):
+        return last_segment
+
+    return None
 
 
 def print_cost_cover(project_id, url):
