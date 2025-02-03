@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime, timedelta
+from urllib.parse import urlparse, parse_qs
 
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
@@ -9,7 +10,23 @@ from ExcelModifier import ExcelModifier
 def pretty_print_json(data):
     print(json.dumps(data, indent=4, ensure_ascii=False))
 
-def print_cost_cover(project_id):
+def extract_cost_id(url):
+    # Parse the URL
+    parsed_url = urlparse(url)
+
+    # Check if 'preview=' exists in the query parameters
+    query_params = parse_qs(parsed_url.query)
+    if 'preview' in query_params:
+        return query_params['preview'][0]
+
+    # If no preview, split the path by '/' and get the last segment
+    path_segments = parsed_url.path.strip("/").split("/")
+
+    # The last segment is the cost ID
+    return path_segments[-1] if path_segments else None
+
+
+def print_cost_cover(project_id, url):
     acc_api = ACCAPI()
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
@@ -20,21 +37,33 @@ def print_cost_cover(project_id):
     
     # Keep checking previous months if no payments found
     cost_payments = []
-    while not cost_payments:
+    
+    
+    cost_id = extract_cost_id(url)
+    
+    
+    if cost_id:
         cost_payments = [
                 cost_payment for cost_payment in cost_payment_response
                 if cost_payment["associationType"] == "Contract"
-                   and datetime.strptime(cost_payment["endDate"], "%Y-%m-%d").strftime("%Y-%m") == current_date.strftime("%Y-%m")
+                   and cost_payment["id"] == cost_id
         ]
-        # Move to the previous month if no results
-        if not cost_payments:
-            current_date = current_date.replace(day=1) - timedelta(days=1)
+    else:
+        while not cost_payments:
+            cost_payments = [
+                    cost_payment for cost_payment in cost_payment_response
+                    if cost_payment["associationType"] == "Contract"
+                       and datetime.strptime(cost_payment["endDate"], "%Y-%m-%d").strftime("%Y-%m") == current_date.strftime("%Y-%m")
+            ]
+            # Move to the previous month if no results
+            if not cost_payments:
+                current_date = current_date.replace(day=1) - timedelta(days=1)
+    
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
     print(change_orders)
     
     for payment in cost_payments:
-        
         association_Id = payment["associationId"]
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
