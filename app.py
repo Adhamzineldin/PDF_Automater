@@ -28,6 +28,8 @@ def process_request(data):
     url = data.get('url')
     if not url:
         return {"error": "URL not provided", "status_code": 400}
+    
+    print(f"Processing request for URL: {url}")
 
     # Extract Project ID using regex
     project_id = None
