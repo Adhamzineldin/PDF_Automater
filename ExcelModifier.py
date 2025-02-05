@@ -125,7 +125,7 @@ class ExcelModifier:
 
 
 
-    def export_to_pdf(self, payment, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Adhams_Server"):
+    def export_to_pdf(self, payment, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Cost Cover Sheets"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
