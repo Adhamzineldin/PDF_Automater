@@ -231,6 +231,14 @@ class ACCAPI:
             print("Syncing Adham Server directory...")
             
             os.makedirs(adham_server_dir)
+
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+            
+            
             
             find_command = f'find "{server_folder_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
             
