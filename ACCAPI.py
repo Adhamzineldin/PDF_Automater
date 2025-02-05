@@ -185,7 +185,7 @@ class ACCAPI:
             print(f"An error occurred while processing the SVG: {e}")
             return None
 
-    def upload_pdf_to_acc(self, pdf_path, filename, project_name="Information Systems Workspace", folder_name="Adhams_Server"):
+    def upload_pdf_to_acc(self, pdf_path, filename, project_name="Information Systems Workspace", folder_name="Cost Cover Sheets"):
         """
         Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
     
