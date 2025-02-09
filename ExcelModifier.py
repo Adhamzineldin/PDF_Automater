@@ -264,12 +264,18 @@ class ExcelModifier:
         name = f"{excel_filename}.pdf"  # Add .pdf extension explicitly
         print(f"Name for PDF: {name}")
     
-        pdf_path = os.path.join(self.modified_folder, name)
+        # Get the current working directory dynamically
+        current_directory = os.path.abspath(os.getcwd())
+        print(f"Current directory: {current_directory}")
+    
+        # Construct the full path for saving the PDF
+        pdf_path = os.path.join(current_directory, self.modified_folder, name)
         print(f"Saving PDF to: {pdf_path}")
     
-        if not os.path.exists(self.modified_folder):
+        # Ensure the folder exists
+        if not os.path.exists(os.path.join(current_directory, self.modified_folder)):
             print(f"Creating folder: {self.modified_folder}")
-            os.makedirs(self.modified_folder)
+            os.makedirs(os.path.join(current_directory, self.modified_folder))
     
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
@@ -285,7 +291,7 @@ class ExcelModifier:
                 return None
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
-            temp_xlsx = f"modified_files/{excel_filename}.xlsx"
+            temp_xlsx = f"{current_directory}/modified_files/{excel_filename}.xlsx"
             print(f"Checking if {temp_xlsx} exists.")
     
             if not os.path.exists(temp_xlsx):
@@ -299,7 +305,7 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice', '--headless',
                         '--convert-to', 'pdf',
-                        '--outdir', self.modified_folder,
+                        '--outdir', os.path.join(current_directory, "modified_files"),
                         temp_xlsx
                 ]
                 result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -307,7 +313,7 @@ class ExcelModifier:
                 print(f"LibreOffice stderr: {result.stderr.decode()}")
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
-                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+                generated_pdf = os.path.join(current_directory, self.modified_folder, f'{excel_filename}.pdf')
                 print(f"Generated PDF: {generated_pdf}")
     
                 # If the output file already exists, delete it to avoid conflicts.
@@ -315,14 +321,13 @@ class ExcelModifier:
                     os.remove(pdf_path)
     
                 # Rename the generated PDF to the desired filename (overwrite if exists).
-                # os.rename(generated_pdf, pdf_path)
-                # print(f"PDF exported at {pdf_path}")
+                os.rename(generated_pdf, pdf_path)
+                print(f"PDF exported at {pdf_path}")
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
     
         return pdf_path
-
 
     def insert_svg_as_image(self, svg_code, cell_range):
         """
