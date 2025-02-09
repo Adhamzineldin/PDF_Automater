@@ -268,7 +268,7 @@ class ACCAPI:
         print(f"Changed back to the original working directory: {original_dir}")
 
 
-    def download_project_zips(project_name="Information Systems Workspace"):
+    def download_project_zips(self, project_name="Information Systems Workspace"):
         """
         Recursively syncs the entire Autodesk Odrive project, downloads all .zip.cloud files inside 'cloudf' folders,
         and returns paths of all .zip files found in the project.
