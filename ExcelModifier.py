@@ -57,25 +57,28 @@ class ExcelModifier:
             cell.value = value
         else:
             # openpyxl handling
-            # Check if the cell range is merged
+            # Get the top-left cell from the provided range
             cell = self.sheet[cell_range.split(":")[0]]
     
-            # If the cell is part of a merged range, modify the top-left cell
-            if cell.merge_cells:
-                # Get the boundaries of the merged cell range
-                min_col, min_row, max_col, max_row = range_boundaries(cell.merged_cells)
-    
-                # Access the top-left cell of the merged range (min_row, min_col)
-                top_left_cell = self.sheet.cell(row=min_row, column=min_col)
-    
-                # Set the value to the top-left cell
-                top_left_cell.value = value
+            # Check if the cell is part of a merged range in the worksheet
+            merged_cells = self.sheet.merged_cells
+            for merged_range in merged_cells:
+                if cell.coordinate in merged_range:
+                    # If the cell is part of a merged range, find the top-left cell
+                    min_col, min_row, max_col, max_row = range_boundaries(str(merged_range))
+                    top_left_cell = self.sheet.cell(row=min_row, column=min_col)
+                    top_left_cell.value = value
+                    break
             else:
-                # If it's not a merged cell, set the value directly
+                # If the cell is not merged, set the value directly
                 cell.value = value
-    
-        print(f"Cell {cell_range} updated to {value}.")
 
+        print(f"Cell {cell_range} updated to {value}.")
+        
+        
+        
+        
+        
     def auto_fit_columns(self):
         """Automatically adjusts all columns to fit content."""
         if self.sheet is None:
