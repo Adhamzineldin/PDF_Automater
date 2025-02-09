@@ -56,12 +56,23 @@ class ExcelModifier:
         else:
             # For openpyxl, handle merged cells properly
             cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
-            # Check if the cell is part of a merged range
-            if cell.merged_cells:
-                # Get the top-left cell of the merged range
-                top_left_cell = self.sheet[cell.merged_cells.bounds[0], cell.merged_cells.bounds[1]]
-                top_left_cell.value = value
+    
+            # Check if the cell is part of a merged range using openpyxl's merged_cells method
+            is_merged = False
+            for merged_range in self.sheet.merged_cells.ranges:
+                if cell in merged_range:
+                    is_merged = True
+                    break
+    
+            if is_merged:
+                # If the cell is merged, modify the top-left cell of the merged range
+                for merged_range in self.sheet.merged_cells.ranges:
+                    if cell in merged_range:
+                        top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
+                        top_left_cell.value = value
+                        break
             else:
+                # Modify the original cell if it's not part of a merged range
                 cell.value = value
         print(f"Cell {cell_range} updated to {value}.")
 
