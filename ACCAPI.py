@@ -364,10 +364,10 @@ class ACCAPI:
             subprocess.run(refresh_command, shell=True, check=True)
             print(f"Refreshed: {folder_path}")
     
-        # Step 2: Recursively sync the project WITHOUT downloading files
-        sync_project_command = f'$HOME/.odrive-agent/bin/odrive sync "{project_path}" --recursive --nodownload'
-        subprocess.run(sync_project_command, shell=True, check=True)
-        print(f"Project '{project_name}' synced recursively (no download).")
+        # # Step 2: Recursively sync the project WITHOUT downloading files
+        # sync_project_command = f'$HOME/.odrive-agent/bin/odrive sync "{project_path}" --recursive --nodownload'
+        # subprocess.run(sync_project_command, shell=True, check=True)
+        # print(f"Project '{project_name}' synced recursively (no download).")
     
         # Step 3: Find all .zip files in the project directory
         find_zip_command = f'find "{project_path}" -type f -name "*.zip"'
