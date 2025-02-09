@@ -246,7 +246,7 @@ def generate_smart_form():
                 file_name = f"{proj} - {date_now} Summary"
                 modifier.save_workbook(filename=f"{file_name}.xlsx")  
                 pdf_path = f"modified_files/{file_name}.pdf"    
-                modifier.export_to_pdf_no_upload(excel_filename={file_name})
+                modifier.export_to_pdf_no_upload(excel_filename=file_name)
                 acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=f"{file_name}.pdf", folder_name=f"Equipment/{proj}")
 
             except Exception as e:
