@@ -268,7 +268,7 @@ class ACCAPI:
         print(f"Changed back to the original working directory: {original_dir}")
 
 
-    def download_project_zips(project_name="Information Systems Workspace"):
+    def download_project_zips(self, project_name="Information Systems Workspace"):
         """
         Searches for all ZIP files in the specified Autodesk Odrive project and downloads them.
         
