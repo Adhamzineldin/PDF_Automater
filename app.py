@@ -1,10 +1,10 @@
+import io
 import json
 import re
 import os
 import tempfile
 import threading
 import queue
-import time
 import zipfile
 
 from flask import Flask, request, send_file, jsonify, Response
@@ -155,70 +155,35 @@ def generate_pdf():
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
 
-@app.route('/download-zips/progress')
-def download_zips_progress():
-    def event_stream():
-        while True:
-            if progress.get("status") == "done":
-                yield "data: done\n\n"
-                break
-            elif "message" in progress:
-                yield f"data: {progress['message']}\n\n"
-            time.sleep(1)
-
-    return Response(event_stream(), content_type="text/event-stream")
-
-
-def generate_zip():
-    global progress
+@app.route('/download-zips')
+def download_zips():
     acc_api = ACCAPI()
     result = acc_api.download_project_zips("Information Systems Workspace")
 
     if "error" in result:
-        progress["message"] = "Error: " + result["error"]
-        return
+        return jsonify(result), result["status_code"]
 
     zip_files = result["files"]
     if not zip_files:
-        progress["message"] = "No ZIP files found."
-        return
+        return jsonify({"error": "No ZIP files found."}), 404
 
-    temp_zip_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
+    def generate():
+        with io.BytesIO() as temp_zip:
+            with zipfile.ZipFile(temp_zip, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for idx, file_path in enumerate(zip_files):
+                    zip_filename = os.path.basename(file_path)
+                    zipf.write(file_path, zip_filename)
 
-    with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as temp_zip:
-        for idx, file_path in enumerate(zip_files):
-            zip_filename = os.path.basename(file_path)
-            temp_zip.write(file_path, zip_filename)
-            progress["message"] = f"Processing {idx + 1}/{len(zip_files)} files..."
-            time.sleep(1)  # Simulate processing time
+                    print(f"Added {idx+1}/{len(zip_files)} files: {zip_filename}")  # Shows progress in terminal
 
-    progress["status"] = "done"
-    progress["zip_path"] = temp_zip_path
+                    temp_zip.seek(0)
+                    yield temp_zip.read()
+                    temp_zip.truncate(0)  # Clear memory to save RAM
 
+            temp_zip.seek(0)
+            yield temp_zip.read()  # Send final zip data
 
-
-@app.route('/download-zips')
-def start_download():
-    global progress
-    progress = {"status": "processing", "message": "Starting ZIP creation..."}
-
-    thread = threading.Thread(target=generate_zip)
-    thread.start()
-
-    return jsonify({"message": "ZIP creation started.", "progress_url": "/download-zips/progress"})
-
-
-
-@app.route('/download-zips/download')
-def download_zip():
-    global progress
-    if progress.get("status") != "done":
-        return jsonify({"error": "ZIP file not ready yet."}), 400
-
-    zip_path = progress.get("zip_path")
-    return send_file(zip_path, as_attachment=True, download_name="all_zips.zip")
-
-
+    return Response(generate(), content_type='application/zip', headers={"Content-Disposition": "attachment; filename=all_zips.zip"})
 
 
 
