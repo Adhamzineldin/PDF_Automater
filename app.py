@@ -155,7 +155,7 @@ def download_zips():
     project_name = request.args.get('project_name', 'Information Systems Workspace')  # Default project name
     result = accapi.download_project_zips()
 
-    return jsonify(result), result["status_code"]
+    return "Zips downloaded successfully!"
 
 
 
