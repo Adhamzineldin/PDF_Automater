@@ -6,7 +6,7 @@ accapi = ACCAPI.ACCAPI()
 
 
 # Get list of files in the folder
-url = f"data/v1/projects/32d52d7d-b9fd-473d-8963-21ba503f854b/folders/topFolders"
+url = f"cost/v1/containers/{accapi.CONTAINER_ID}/documents"
 response = accapi.call_api(url)
 
 

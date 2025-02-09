@@ -179,6 +179,12 @@ def download_zips():
     return response
 
 
+@app.route('/get-zips')
+def get_zips():
+    acc_api = ACCAPI()
+    result = acc_api.get_project_zip_files("Information Systems Workspace")
+    return jsonify(result)
+
 
 @app.route('/health_check_upstream1')
 def health_check():
