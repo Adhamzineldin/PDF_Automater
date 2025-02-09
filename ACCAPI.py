@@ -355,14 +355,10 @@ class ACCAPI:
         check_command = f'$HOME/.odrive-agent/bin/odrive status --json "{folder_path}"'
         result = subprocess.run(check_command, shell=True, capture_output=True, text=True)
         
-        if '"status": "not_synced"' in result.stdout:  # If it's a cloud placeholder
-            sync_command = f'$HOME/.odrive-agent/bin/odrive sync "{folder_path}"'
-            subprocess.run(sync_command, shell=True, check=True)
-            print("Folder was a cloud placeholder and has been synced.")
-        else:  # If already synced, refresh it
-            refresh_command = f'$HOME/.odrive-agent/bin/odrive refresh "{folder_path}"'
-            subprocess.run(refresh_command, shell=True, check=True)
-            print("Folder was already synced. Refreshed to ensure latest content.")
+        
+        refresh_command = f'$HOME/.odrive-agent/bin/odrive refresh "{folder_path}"'
+        subprocess.run(refresh_command, shell=True, check=True)
+        print("Folder was already synced. Refreshed to ensure latest content.")
     
         # Step 2: Recursively sync the project without downloading
         sync_project_command = f'$HOME/.odrive-agent/bin/odrive sync "{base_path}/{project_name}" --recursive --nodownload'
