@@ -115,14 +115,32 @@ class ExcelModifier:
     #     print(f"Inserted a new row at {row}.")
 
 
-    def insert_row(self, row):
-        """Inserts a new row using openpyxl."""
+    def insert_row(self, row_data, row_index=1):
+        """Inserts a row with the given data at the specified row index."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-    
-        # Insert a new row by shifting down all rows starting from the target row
-        self.sheet.insert_rows(row)
-        print(f"Inserted a new row at {row}.")
+        
+        if self.backend == 'xlwings':
+            sheet_api = self.sheet.api
+            try:
+                # Insert row using xlwings API
+                sheet_api.Rows(row_index).Insert()
+                for col, value in enumerate(row_data, 1):
+                    sheet_api.Cells(row_index, col).Value = value
+                print(f"Row inserted at {row_index} with data: {row_data}")
+            except Exception as e:
+                print(f"Error inserting row with xlwings: {e}")
+                return None
+        else:
+            try:
+                # Insert row using openpyxl
+                self.sheet.insert_rows(row_index)
+                for col, value in enumerate(row_data, 1):
+                    self.sheet.cell(row=row_index, column=col).value = value
+                print(f"Row inserted at {row_index} with data: {row_data}")
+            except Exception as e:
+                print(f"Error inserting row with openpyxl: {e}")
+                return None
 
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
