@@ -255,7 +255,6 @@ class ExcelModifier:
     
         return pdf_path
 
-
     def export_to_pdf_no_upload(self, excel_filename="output"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:

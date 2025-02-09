@@ -247,7 +247,8 @@ def generate_smart_form():
                 print(f"Saving workbook as {file_name}.xlsx")
                 modifier.save_workbook(filename=f"{file_name}.xlsx")
                 print(f"Exporting to PDF")
-                modifier.export_to_pdf(excel_filename=file_name, destination_folder=f"Equipment/{proj}")
+                print("-" * 40)
+                modifier.export_to_pdf_no_upload(excel_filename=file_name)
                 
                 # modifier.save_workbook(filename=f"{file_name}.xlsx")  
                 # pdf_path = f"modified_files/{file_name}.pdf"    
