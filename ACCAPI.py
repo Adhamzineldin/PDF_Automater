@@ -339,41 +339,45 @@ class ACCAPI:
         """
         Recursively syncs the entire Autodesk Odrive project without downloading files,
         and returns a list of all .zip file paths in the project directory.
-        
+    
         :param project_name: The name of the project to search for ZIP files.
-        :return: List of .zip file paths found in the project.
+        :return: Dictionary containing .zip file paths or an error message.
         """
         home_dir = os.path.expanduser("~")
-        base_path = os.path.join(home_dir, f'server/odrive/Autodesk/')
-        project_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files')
+        base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
+        project_path = os.path.join(base_path, "Square Engineering Firm", project_name, "Project Files")
     
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
     
-        # Step 1: Sync Square Engineering Firm without recursion
+        # Step 1: Sync "Square Engineering Firm" folder only if it's a cloud placeholder
         folder_path = os.path.join(base_path, "Square Engineering Firm")
         check_command = f'$HOME/.odrive-agent/bin/odrive status --json "{folder_path}"'
         result = subprocess.run(check_command, shell=True, capture_output=True, text=True)
-        
-        
-        refresh_command = f'$HOME/.odrive-agent/bin/odrive refresh "{folder_path}"'
-        subprocess.run(refresh_command, shell=True, check=True)
-        print("Folder was already synced. Refreshed to ensure latest content.")
     
-        # Step 2: Recursively sync the project without downloading
-        sync_project_command = f'$HOME/.odrive-agent/bin/odrive sync "{base_path}/{project_name}" --recursive --nodownload'
+        if '"status": "not_synced"' in result.stdout:
+            sync_command = f'$HOME/.odrive-agent/bin/odrive sync "{folder_path}"'
+            subprocess.run(sync_command, shell=True, check=True)
+            print(f"Synced: {folder_path}")
+        else:
+            refresh_command = f'$HOME/.odrive-agent/bin/odrive refresh "{folder_path}"'
+            subprocess.run(refresh_command, shell=True, check=True)
+            print(f"Refreshed: {folder_path}")
+    
+        # Step 2: Recursively sync the project WITHOUT downloading files
+        sync_project_command = f'$HOME/.odrive-agent/bin/odrive sync "{project_path}" --recursive --nodownload'
         subprocess.run(sync_project_command, shell=True, check=True)
+        print(f"Project '{project_name}' synced recursively (no download).")
     
         # Step 3: Find all .zip files in the project directory
         find_zip_command = f'find "{project_path}" -type f -name "*.zip"'
         result = subprocess.run(find_zip_command, shell=True, capture_output=True, text=True)
         zip_files = result.stdout.strip().split("\n") if result.stdout else []
     
-        if not zip_files:
+        if not zip_files or zip_files == ['']:
             return {"error": "No ZIP files found in the project.", "status_code": 404}
     
         return {"message": "ZIP files found successfully.", "files": zip_files, "status_code": 200}
-    
     
     def call_api(self, endpoint, params=None):
         # Load the refresh token
