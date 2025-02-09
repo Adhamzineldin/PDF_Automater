@@ -1,4 +1,3 @@
-import io
 import json
 import re
 import os
@@ -8,8 +7,6 @@ import queue
 import zipfile
 
 from flask import Flask, request, send_file, jsonify, Response
-from werkzeug.utils import secure_filename
-
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
@@ -167,23 +164,19 @@ def download_zips():
     if not zip_files:
         return jsonify({"error": "No ZIP files found."}), 404
 
-    def generate():
-        with io.BytesIO() as temp_zip:
-            with zipfile.ZipFile(temp_zip, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for idx, file_path in enumerate(zip_files):
-                    zip_filename = os.path.basename(file_path)
-                    zipf.write(file_path, zip_filename)
+    # Create a temporary ZIP archive
+    temp_zip_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
 
-                    print(f"Added {idx+1}/{len(zip_files)} files: {zip_filename}")  # Shows progress in terminal
+    with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as temp_zip:
+        for file_path in zip_files:
+            zip_filename = os.path.basename(file_path)
+            temp_zip.write(file_path, zip_filename)
 
-                    temp_zip.seek(0)
-                    yield temp_zip.read()
-                    temp_zip.truncate(0)  # Clear memory to save RAM
+    # Send the archive to the user
+    response = send_file(temp_zip_path, as_attachment=True, download_name="all_zips.zip")
+    response.call_on_close(lambda: os.remove(temp_zip_path))  # Ensure cleanup after response is sent
 
-            temp_zip.seek(0)
-            yield temp_zip.read()  # Send final zip data
-
-    return Response(generate(), content_type='application/zip', headers={"Content-Disposition": "attachment; filename=all_zips.zip"})
+    return response
 
 
 
