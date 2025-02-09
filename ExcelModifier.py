@@ -255,11 +255,14 @@ class ExcelModifier:
     
         return pdf_path
 
+
     def export_to_pdf_no_upload(self, excel_filename="output"):
         """Exports the sheet to a PDF, fitting it to a single page."""
+    
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
+        # Construct the PDF file name and path
         name = f"{excel_filename}.pdf"  # Add .pdf extension explicitly
         print(f"Name for PDF: {name}")
     
@@ -267,15 +270,24 @@ class ExcelModifier:
         current_directory = os.path.abspath(os.getcwd())
         print(f"Current directory: {current_directory}")
     
+        # Ensure the folder exists
+        modified_folder_path = os.path.join(current_directory, self.modified_folder)
+        if not os.path.exists(modified_folder_path):
+            print(f"Creating folder: {self.modified_folder}")
+            os.makedirs(modified_folder_path)
+    
         # Construct the full path for saving the PDF
-        pdf_path = os.path.join(current_directory, self.modified_folder, name)
+        pdf_path = os.path.join(modified_folder_path, name)
         print(f"Saving PDF to: {pdf_path}")
     
-        # Ensure the folder exists
-        if not os.path.exists(os.path.join(current_directory, self.modified_folder)):
-            print(f"Creating folder: {self.modified_folder}")
-            os.makedirs(os.path.join(current_directory, self.modified_folder))
+        # Check if the Excel file exists before attempting to convert it
+        temp_xlsx = os.path.join(modified_folder_path, f"{excel_filename}.xlsx")
+        print(f"Checking if {temp_xlsx} exists.")
+        if not os.path.exists(temp_xlsx):
+            print(f"Error: {temp_xlsx} does not exist.")
+            return None
     
+        # Handle exporting to PDF
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
             sheet_api = self.sheet.api
@@ -290,21 +302,11 @@ class ExcelModifier:
                 return None
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
-            temp_xlsx = f"{current_directory}/modified_files/{excel_filename}.xlsx"
-            print(f"Checking if {temp_xlsx} exists.")
-    
-            if not os.path.exists(temp_xlsx):
-                print(f"Error: {temp_xlsx} does not exist.")
-                return None
-    
-            # Capture the current working directory
-            original_dir = os.getcwd()
-    
             try:
                 cmd = [
                         'libreoffice', '--headless',
                         '--convert-to', 'pdf',
-                        '--outdir', os.path.join(current_directory, "modified_files"),
+                        '--outdir', modified_folder_path,
                         temp_xlsx
                 ]
                 result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -312,7 +314,7 @@ class ExcelModifier:
                 print(f"LibreOffice stderr: {result.stderr.decode()}")
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
-                generated_pdf = os.path.join(current_directory, self.modified_folder, f'{excel_filename}.pdf')
+                generated_pdf = os.path.join(modified_folder_path, f'{excel_filename}.pdf')
                 print(f"Generated PDF: {generated_pdf}")
     
                 # If the output file already exists, delete it to avoid conflicts.
@@ -324,6 +326,8 @@ class ExcelModifier:
                 print(f"PDF exported at {pdf_path}")
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
+                print(f"Stdout: {e.stdout}")
+                print(f"Stderr: {e.stderr}")
                 return None
     
         return pdf_path
