@@ -243,7 +243,7 @@ def generate_smart_form():
 
             try:
                  
-                file_name = f"{proj} - {date_now} Summary"
+                file_name = f"{proj} Summary"
                 modifier.save_workbook(filename=f"{file_name}.xlsx")  
                 pdf_path = f"modified_files/{file_name}.pdf"    
                 modifier.export_to_pdf_no_upload(excel_filename=file_name)
