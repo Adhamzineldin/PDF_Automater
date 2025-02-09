@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import time
 
@@ -265,6 +266,53 @@ class ACCAPI:
         # Change back to the original working directory
         os.chdir(original_dir)
         print(f"Changed back to the original working directory: {original_dir}")
+
+
+    def download_project_zips(project_name="Information Systems Workspace"):
+        """
+        Searches for all ZIP files in the specified Autodesk Odrive project and downloads them.
+        
+        :param project_name: The name of the project to search for ZIP files.
+        """
+        home_dir = os.path.expanduser("~")
+        project_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files')
+        download_path = os.path.join(home_dir, 'Downloads')
+    
+        if not os.path.exists(project_path):
+            return {"error": f"Project '{project_name}' not found.", "status_code": 404}
+    
+        # Refresh the Odrive project directory
+        subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', project_path], check=True)
+    
+        # Find all ZIP files in the project directory
+        find_command = f'find "{project_path}" -type f -name "*.zip"'
+        result = subprocess.run(find_command, shell=True, capture_output=True, text=True)
+    
+        zip_files = result.stdout.strip().split("\n") if result.stdout else []
+    
+        if not zip_files:
+            return {"error": "No ZIP files found in the project.", "status_code": 404}
+    
+        # Ensure download folder exists
+        os.makedirs(download_path, exist_ok=True)
+    
+        downloaded_files = []
+        for zip_file in zip_files:
+            zip_filename = os.path.basename(zip_file)
+            local_zip_path = os.path.join(download_path, zip_filename)
+    
+            # Copy ZIP file to Downloads
+            shutil.copy(zip_file, local_zip_path)
+            downloaded_files.append(local_zip_path)
+    
+        return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}
+        
+        
+        
+        
+        
+        
+        
         
         
 
