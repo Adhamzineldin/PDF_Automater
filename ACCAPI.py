@@ -287,41 +287,44 @@ class ACCAPI:
         full_sync_command = f'find "{project_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;'
         subprocess.run(full_sync_command, shell=True, check=True)
     
-        # Step 2: Find all .zip.cloud files inside "cloudf" folders
+        # Step 2: Find and sync .zip.cloud files inside "cloudf" folders
         find_cloud_zip_command = f'find "{project_path}" -path "*/cloudf/*" -type f -name "*.zip.cloud"'
         result = subprocess.run(find_cloud_zip_command, shell=True, capture_output=True, text=True)
         cloud_zip_files = result.stdout.strip().split("\n") if result.stdout else []
-    
-        downloaded_zips = []
     
         for cloud_file in cloud_zip_files:
             if not cloud_file.endswith(".zip.cloud"):
                 continue
     
-            # Sync the .zip.cloud file (convert it to .zip)
             sync_command = f'~/.odrive-agent/bin/odrive sync "{cloud_file}"'
             subprocess.run(sync_command, shell=True, check=True)
     
-            # Wait for the file to download (Check if .zip exists and .zip.cloud is gone)
-            local_zip_file = cloud_file.replace(".cloud", "")
-            while os.path.exists(cloud_file) or not os.path.exists(local_zip_file):
-                time.sleep(2)  # Wait for file to finish downloading
+            # Wait for file to fully download
+            while os.path.exists(cloud_file):
+                time.sleep(2)
     
-            downloaded_zips.append(local_zip_file)
+        # Step 3: Find all .zip files in the project directory
+        find_zip_command = f'find "{project_path}" -type f -name "*.zip"'
+        result = subprocess.run(find_zip_command, shell=True, capture_output=True, text=True)
+        zip_files = result.stdout.strip().split("\n") if result.stdout else []
     
-        # Step 3: Ensure the download folder exists
+        if not zip_files:
+            return {"error": "No ZIP files found in the project.", "status_code": 404}
+    
+        # Ensure the download folder exists
         os.makedirs(download_path, exist_ok=True)
     
-        # Step 4: Move all downloaded ZIP files to Downloads
         downloaded_files = []
-        for zip_file in downloaded_zips:
+        for zip_file in zip_files:
             zip_filename = os.path.basename(zip_file)
             local_zip_path = os.path.join(download_path, zip_filename)
     
+            # Copy ZIP file to Downloads
             shutil.copy(zip_file, local_zip_path)
             downloaded_files.append(local_zip_path)
     
         return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}
+        
         
         
         
