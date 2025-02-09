@@ -261,59 +261,40 @@ class ExcelModifier:
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
-        # Use the excel_filename for naming instead of payment["number"]
-        name = f"{excel_filename}"
-        print(name)
+        # Construct paths and ensure directory exists
+        modified_folder_path = "modified_files"
+        os.makedirs(modified_folder_path, exist_ok=True)
     
-        pdf_path = os.path.join(self.modified_folder, f"{name}.pdf")
-        print(pdf_path)
+        temp_xlsx = os.path.join(modified_folder_path, f"{excel_filename}.xlsx")
+        if not os.path.exists(temp_xlsx):
+            print(f"Error: {temp_xlsx} does not exist.")
+            return None
     
-        if self.backend == 'xlwings':
-            # Windows-specific export using xlwings (unchanged)
-            sheet_api = self.sheet.api
-            sheet_api.PageSetup.FitToPagesWide = 1  # Fit to one page wide
-            sheet_api.PageSetup.FitToPagesTall = 1   # Fit to one page tall
-            sheet_api.PageSetup.Zoom = False         # Disable zoom
-            try:
-                sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
-                print(f"PDF exported at {pdf_path}")
-            except Exception as e:
-                print(f"Error exporting to PDF: {e}")
-                return None
-        else:
-            # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
-            temp_xlsx = f"modified_files/{excel_filename}.xlsx"
-            # Capture the current working directory
-            original_dir = os.getcwd()
+        pdf_path = os.path.join(modified_folder_path, f"{excel_filename}.pdf")
     
-            try:
-                cmd = [
-                        'libreoffice', '--headless',
-                        '--convert-to', 'pdf',
-                        '--outdir', self.modified_folder,
-                        temp_xlsx
-                ]
+        # Convert using LibreOffice
+        try:
+            cmd = [
+                    'libreoffice', '--headless',
+                    '--convert-to', 'pdf',
+                    '--outdir', modified_folder_path,
+                    temp_xlsx  # No quotes needed; subprocess handles spaces
+            ]
+            result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"LibreOffice stdout: {result.stdout.decode()}")
+            print(f"LibreOffice stderr: {result.stderr.decode()}")
     
-                subprocess.run(cmd, check=True)
-    
-                # Ensure that the generated PDF has the same name as the input XLSX file.
-                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
-                print(generated_pdf)
-    
-                # If the output file already exists, delete it to avoid conflicts.
-                if os.path.exists(pdf_path):
-                    os.remove(pdf_path)
-    
-                # Rename the generated PDF to the desired filename (overwrite if exists).
-                os.rename(generated_pdf, pdf_path)
-                print(f"PDF exported at {pdf_path}")
-    
-            except subprocess.CalledProcessError as e:
-                print(f"Error exporting to PDF via LibreOffice: {e}")
+            # Verify PDF was created
+            if not os.path.exists(pdf_path):
+                print(f"Error: PDF not generated at {pdf_path}")
                 return None
     
-        return pdf_path
-
+            print(f"PDF exported at {pdf_path}")
+            return pdf_path
+    
+        except subprocess.CalledProcessError as e:
+            print(f"LibreOffice conversion failed: {e.stderr.decode()}")
+            return None
 
 
     def insert_svg_as_image(self, svg_code, cell_range):
