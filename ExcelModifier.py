@@ -180,7 +180,7 @@ class ExcelModifier:
         print(f"Workbook saved at {save_path}")
         return save_path
 
-    def export_to_pdf(self, payment, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Cost Cover Sheets"):
+    def export_to_pdf(self, payment=None, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Cost Cover Sheets"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
