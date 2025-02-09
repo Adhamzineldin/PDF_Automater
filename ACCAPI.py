@@ -287,7 +287,7 @@ class ACCAPI:
         subprocess.run(refresh_command, shell=True, check=True)
     
         # Find all cloud ZIP files
-        find_command = f'find "{project_path}" -type f -name "*.zip.cloud"'
+        find_command = f'find "{project_path}" -type f -name "*.zip"'
         result = subprocess.run(find_command, shell=True, capture_output=True, text=True)
         zip_cloud_files = result.stdout.strip().split("\n") if result.stdout else []
     
