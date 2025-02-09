@@ -109,9 +109,19 @@ class ExcelModifier:
                     cell.border = border
         print("Gridlines added to the sheet.")
 
+    # def insert_row(self, row):
+    #     """Inserts a new row using xlwings by shifting down rows manually."""
+    #     self.sheet.range(f"{row}:{row}").insert(shift="down")
+    #     print(f"Inserted a new row at {row}.")
+
+
     def insert_row(self, row):
-        """Inserts a new row using xlwings by shifting down rows manually."""
-        self.sheet.range(f"{row}:{row}").insert(shift="down")
+        """Inserts a new row using openpyxl."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
+        # Insert a new row by shifting down all rows starting from the target row
+        self.sheet.insert_rows(row)
         print(f"Inserted a new row at {row}.")
 
     def save_workbook(self, filename='modified.xlsx'):
