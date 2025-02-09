@@ -3,7 +3,7 @@ import re
 import os
 import threading
 import queue
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, jsonify, Response
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
@@ -149,12 +149,28 @@ def generate_pdf():
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
 
-@app.route('/download-zips', methods=['GET'])
-def download_zips():
-    accapi = ACCAPI()
-    result = accapi.download_project_zips()
+@app.route('/download-zips/<project_name>')
+def download_zips(project_name):
+    """
+    Flask route to download all ZIP files in the specified Autodesk Odrive project.
+    """
+    acc_api = ACCAPI()
+    
+    result = acc_api.download_project_zips(project_name)
 
-    return jsonify(result), result["status_code"]
+    if "error" in result:
+        return jsonify(result), result["status_code"]
+
+    # Create a generator to send files one by one
+    def generate():
+        for file_path in result["files"]:
+            with open(file_path, "rb") as f:
+                yield f.read()
+
+    response = Response(generate(), content_type="application/zip")
+    response.headers["Content-Disposition"] = f'attachment; filename="{project_name}_zips.zip.cloud"'
+
+    return response
 
 
 
