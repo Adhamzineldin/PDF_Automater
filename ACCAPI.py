@@ -288,7 +288,7 @@ class ACCAPI:
         subprocess.run(full_sync_command, shell=True, check=True)
     
         # Step 2: Find and sync .zip.cloud files inside "cloudf" folders
-        find_cloud_zip_command = f'find "{project_path}" -path "*/cloudf/*" -type f -name "*.zip.cloud"'
+        find_cloud_zip_command = f'find "{project_path}" -type f -name "*.zip.cloud"'
         result = subprocess.run(find_cloud_zip_command, shell=True, capture_output=True, text=True)
         cloud_zip_files = result.stdout.strip().split("\n") if result.stdout else []
     
