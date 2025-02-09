@@ -54,10 +54,15 @@ class ExcelModifier:
             cell = self.sheet.range(cell_range)
             cell.value = value
         else:
-            # openpyxl accepts a single cell address; if a range is provided,
-            # we assume the top-left cell should be updated.
-            cell = self.sheet[cell_range.split(":")[0]]
-            cell.value = value
+            # For openpyxl, handle merged cells properly
+            cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
+            # Check if the cell is part of a merged range
+            if cell.merged_cells:
+                # Get the top-left cell of the merged range
+                top_left_cell = self.sheet[cell.merged_cells.bounds[0], cell.merged_cells.bounds[1]]
+                top_left_cell.value = value
+            else:
+                cell.value = value
         print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
