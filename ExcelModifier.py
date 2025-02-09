@@ -59,15 +59,17 @@ class ExcelModifier:
     
             # Check if the cell is part of a merged range using openpyxl's merged_cells method
             is_merged = False
+            cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')
+    
             for merged_range in self.sheet.merged_cells.ranges:
-                if cell in merged_range:
+                if cell_coord in merged_range:
                     is_merged = True
                     break
     
             if is_merged:
                 # If the cell is merged, modify the top-left cell of the merged range
                 for merged_range in self.sheet.merged_cells.ranges:
-                    if cell in merged_range:
+                    if cell_coord in merged_range:
                         top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
                         top_left_cell.value = value
                         break
