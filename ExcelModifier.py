@@ -16,7 +16,7 @@ if USE_XLWINGS:
     import xlwings as xw
 else:
     import openpyxl
-    from openpyxl.utils import get_column_letter, range_boundaries
+    from openpyxl.utils import get_column_letter
     from openpyxl.drawing.image import Image as XLImage
     from openpyxl.worksheet.properties import PageSetupProperties
 
@@ -50,35 +50,16 @@ class ExcelModifier:
         """Modifies a specific cell range with a new value."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-    
         if self.backend == 'xlwings':
-            # Use xlwings to modify cell value
             cell = self.sheet.range(cell_range)
             cell.value = value
         else:
-            # openpyxl handling
-            # Get the top-left cell from the provided range
+            # openpyxl accepts a single cell address; if a range is provided,
+            # we assume the top-left cell should be updated.
             cell = self.sheet[cell_range.split(":")[0]]
-    
-            # Check if the cell is part of a merged range in the worksheet
-            merged_cells = self.sheet.merged_cells
-            for merged_range in merged_cells:
-                if cell.coordinate in merged_range:
-                    # If the cell is part of a merged range, find the top-left cell
-                    min_col, min_row, max_col, max_row = range_boundaries(str(merged_range))
-                    top_left_cell = self.sheet.cell(row=min_row, column=min_col)
-                    top_left_cell.value = value
-                    break
-            else:
-                # If the cell is not merged, set the value directly
-                cell.value = value
-
+            cell.value = value
         print(f"Cell {cell_range} updated to {value}.")
-        
-        
-        
-        
-        
+
     def auto_fit_columns(self):
         """Automatically adjusts all columns to fit content."""
         if self.sheet is None:
@@ -140,6 +121,7 @@ class ExcelModifier:
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
+        # Ensure row_data is an iterable (like list or tuple)
         if not isinstance(row_data, Iterable):
             print("Error: row_data is not iterable.")
             return None
@@ -155,18 +137,19 @@ class ExcelModifier:
             except Exception as e:
                 print(f"Error inserting row with xlwings: {e}")
                 return None
-        else:
+        else:  # Assuming openpyxl as default
             try:
                 # Insert row using openpyxl
                 self.sheet.insert_rows(row_index)
                 for col, value in enumerate(row_data, 1):
+                    # Ensure we're inserting values into the correct cell
                     self.sheet.cell(row=row_index, column=col).value = value
                 print(f"Row inserted at {row_index} with data: {row_data}")
             except Exception as e:
                 print(f"Error inserting row with openpyxl: {e}")
                 return None
-            
-    
+
+
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
         if self.workbook is None:
