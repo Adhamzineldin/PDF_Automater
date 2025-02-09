@@ -111,7 +111,6 @@ def process_request(data):
     finally:
         pass
 
-
 def worker():
     """Background thread that processes requests from the queue."""
     while True:
@@ -125,7 +124,6 @@ def worker():
                 response_queue.put({"error": str(e), "status_code": 500})
             finally:
                 request_queue.task_done()
-
 
 @app.route('/generate-pdf', methods=['POST'])
 def generate_pdf():
@@ -149,6 +147,17 @@ def generate_pdf():
             return jsonify({"error": "PDF generation failed."}), 500
     else:
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
+
+
+@app.route('/download-zips')
+def download_zips():
+    pass
+
+
+
+
+
+
 
 
 
