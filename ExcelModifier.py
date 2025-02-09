@@ -271,10 +271,10 @@ class ExcelModifier:
         print(f"Current directory: {current_directory}")
     
         # Ensure the folder exists
-        modified_folder_path = os.path.join(current_directory, self.modified_folder)
+        modified_folder_path = "modified_files"
         if not os.path.exists(modified_folder_path):
             print(f"Creating folder: {self.modified_folder}")
-            os.makedirs(modified_folder_path)
+            os.makedirs(modified_folder_path, exist_ok=True)
     
         # Construct the full path for saving the PDF
         pdf_path = os.path.join(modified_folder_path, name)
@@ -306,9 +306,10 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice', '--headless',
                         '--convert-to', 'pdf',
-                        '--outdir', os.path.join(current_directory, "modified_files"),
-                        f'"{temp_xlsx}"'
+                        '--outdir', self.modified_folder,
+                        f'"{temp_xlsx}"'  # Quote file path properly
                 ]
+
 
                 result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(f"LibreOffice stdout: {result.stdout.decode()}")
