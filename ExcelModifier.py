@@ -260,13 +260,17 @@ class ExcelModifier:
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-        
-        name = f"{excel_filename}"
-        print(name)
-
+    
+        name = f"{excel_filename}.pdf"  # Ensure .pdf extension is added
+        print(f"Name for PDF: {name}")
+    
         pdf_path = os.path.join(self.modified_folder, name)
-        print(pdf_path)
-
+        print(f"Saving PDF to: {pdf_path}")
+    
+        if not os.path.exists(self.modified_folder):
+            print(f"Creating folder: {self.modified_folder}")
+            os.makedirs(self.modified_folder)
+    
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
             sheet_api = self.sheet.api
@@ -282,9 +286,15 @@ class ExcelModifier:
         else:
             # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
             temp_xlsx = f"modified_files/{excel_filename}.xlsx"
+            print(f"Checking if {temp_xlsx} exists.")
+    
+            if not os.path.exists(temp_xlsx):
+                print(f"Error: {temp_xlsx} does not exist.")
+                return None
+    
             # Capture the current working directory
             original_dir = os.getcwd()
-
+    
             try:
                 cmd = [
                         'libreoffice', '--headless',
@@ -292,39 +302,28 @@ class ExcelModifier:
                         '--outdir', self.modified_folder,
                         temp_xlsx
                 ]
-
-
-
-                subprocess.run(cmd, check=True)
-
+                result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                print(f"LibreOffice stdout: {result.stdout.decode()}")
+                print(f"LibreOffice stderr: {result.stderr.decode()}")
+    
                 # Ensure that the generated PDF has the same name as the input XLSX file.
                 generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
-                print(generated_pdf)
-
+                print(f"Generated PDF: {generated_pdf}")
+    
                 # If the output file already exists, delete it to avoid conflicts.
                 if os.path.exists(pdf_path):
                     os.remove(pdf_path)
-
+    
                 # Rename the generated PDF to the desired filename (overwrite if exists).
                 os.rename(generated_pdf, pdf_path)
                 print(f"PDF exported at {pdf_path}")
-
-
-                acc_api = ACCAPI()
-
-
-
-                
-
-
-
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
-
+    
         return pdf_path
-    
-    
+
+
     def insert_svg_as_image(self, svg_code, cell_range):
         """
         Converts SVG code to PNG using svgpathtools and Pillow, and inserts it into the Excel sheet.
