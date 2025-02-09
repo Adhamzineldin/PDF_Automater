@@ -1,8 +1,11 @@
 import json
 import re
 import os
+import tempfile
 import threading
 import queue
+import zipfile
+
 from flask import Flask, request, send_file, jsonify, Response
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
@@ -157,8 +160,25 @@ def download_zips():
     if "error" in result:
         return jsonify(result), result["status_code"]
 
-    # Send the first ZIP file as an example
-    return send_file(result["files"][0], as_attachment=True)
+    zip_files = result["files"]
+    if not zip_files:
+        return jsonify({"error": "No ZIP files found."}), 404
+
+    # Create a temporary ZIP archive
+    temp_zip_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
+
+    with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as temp_zip:
+        for file_path in zip_files:
+            zip_filename = os.path.basename(file_path)
+            temp_zip.write(file_path, zip_filename)
+
+    # Send the archive to the user
+    response = send_file(temp_zip_path, as_attachment=True, download_name="all_zips.zip")
+
+    # Cleanup: Delete the temporary ZIP file after sending
+    os.remove(temp_zip_path)
+
+    return response
 
 
 
