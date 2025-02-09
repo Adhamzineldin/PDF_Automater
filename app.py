@@ -149,13 +149,13 @@ def generate_pdf():
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
 
-@app.route('/download-zips', methods=['GET', 'POST'])
+@app.route('/download-zips', methods=['GET'])
 def download_zips():
     accapi = ACCAPI()
     project_name = request.args.get('project_name', 'Information Systems Workspace')  # Default project name
     result = accapi.download_project_zips()
 
-    return "Zips downloaded successfully!"
+    return jsonify(result), result["status_code"]
 
 
 
