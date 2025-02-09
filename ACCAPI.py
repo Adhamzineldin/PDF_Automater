@@ -280,10 +280,11 @@ class ACCAPI:
     
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
-    
-        # Refresh the Odrive project directory
-        subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', project_path], check=True)
-    
+
+        refresh_command = f'find "{project_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;'
+        subprocess.run(refresh_command, shell=True, check=True)
+
+
         # Find all ZIP files in the project directory
         find_command = f'find "{project_path}" -type f -name "*.zip"'
         result = subprocess.run(find_command, shell=True, capture_output=True, text=True)
