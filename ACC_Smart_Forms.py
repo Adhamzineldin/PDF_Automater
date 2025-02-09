@@ -57,7 +57,7 @@ def generate_smart_form():
 
 
         # Specify the template file and output folder
-        template_file = 'templates\\template.xlsx'
+        template_file = 'templates/template.xlsx'
         output_folder = 'modified_files'
 
         # Create an instance of the ExcelModifier class
