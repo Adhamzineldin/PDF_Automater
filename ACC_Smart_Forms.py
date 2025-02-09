@@ -244,7 +244,7 @@ def generate_smart_form():
             try:
                 # modifier.save_workbook()  # Save workbook after all rows are processed
                 file_name = f"{proj} - {date_now} Summary"
-                pdf_path = f"modified_files\\{file_name}.pdf"    
+                pdf_path = f"modified_files/{file_name}.pdf"    
                 modifier.export_to_pdf_no_upload(excel_filename=file_name)
                 acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=file_name, folder_name=f"equipment/{proj}")
 
