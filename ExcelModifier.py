@@ -16,7 +16,7 @@ if USE_XLWINGS:
     import xlwings as xw
 else:
     import openpyxl
-    from openpyxl.utils import get_column_letter
+    from openpyxl.utils import get_column_letter, range_boundaries
     from openpyxl.drawing.image import Image as XLImage
     from openpyxl.worksheet.properties import PageSetupProperties
 
@@ -50,14 +50,30 @@ class ExcelModifier:
         """Modifies a specific cell range with a new value."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
+    
         if self.backend == 'xlwings':
+            # Use xlwings to modify cell value
             cell = self.sheet.range(cell_range)
             cell.value = value
         else:
-            # openpyxl accepts a single cell address; if a range is provided,
-            # we assume the top-left cell should be updated.
+            # openpyxl handling
+            # Check if the cell range is merged
             cell = self.sheet[cell_range.split(":")[0]]
-            cell.value = value
+    
+            # If the cell is part of a merged range, modify the top-left cell
+            if cell.merge_cells:
+                # Get the boundaries of the merged cell range
+                min_col, min_row, max_col, max_row = range_boundaries(cell.merged_cells)
+    
+                # Access the top-left cell of the merged range (min_row, min_col)
+                top_left_cell = self.sheet.cell(row=min_row, column=min_col)
+    
+                # Set the value to the top-left cell
+                top_left_cell.value = value
+            else:
+                # If it's not a merged cell, set the value directly
+                cell.value = value
+    
         print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
