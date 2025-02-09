@@ -271,8 +271,8 @@ class ACCAPI:
     def download_project_zips(self, project_name="Information Systems Workspace"):
         """
         Recursively syncs the entire Autodesk Odrive project, downloads all .zip.cloud files inside 'cloudf' folders,
-        and returns paths of all .zip files found in the project.
-    
+        and progressively copies them to the user's Downloads folder.
+        
         :param project_name: The name of the project to search for ZIP files.
         :return: List of downloaded .zip file paths.
         """
@@ -319,12 +319,13 @@ class ACCAPI:
             zip_filename = os.path.basename(zip_file)
             local_zip_path = os.path.join(download_path, zip_filename)
     
-            # Copy ZIP file to Downloads
-            shutil.copy(zip_file, local_zip_path)
+            # 🟢 Use rsync instead of shutil.copy so user sees files while copying
+            rsync_command = f'rsync --progress "{zip_file}" "{local_zip_path}"'
+            subprocess.run(rsync_command, shell=True, check=True)
+    
             downloaded_files.append(local_zip_path)
     
-        return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}
-        
+        return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}  
         
         
         
