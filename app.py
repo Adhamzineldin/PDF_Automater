@@ -174,9 +174,7 @@ def download_zips():
 
     # Send the archive to the user
     response = send_file(temp_zip_path, as_attachment=True, download_name="all_zips.zip")
-
-    # Cleanup: Delete the temporary ZIP file after sending
-    os.remove(temp_zip_path)
+    response.call_on_close(lambda: os.remove(temp_zip_path))  # Ensure cleanup after response is sent
 
     return response
 
