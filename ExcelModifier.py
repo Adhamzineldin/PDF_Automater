@@ -265,7 +265,7 @@ class ExcelModifier:
         name = f"{excel_filename}"
         print(name)
     
-        pdf_path = os.path.join(self.modified_folder, name)
+        pdf_path = os.path.join(self.modified_folder, f"{name}.pdf")
         print(pdf_path)
     
         if self.backend == 'xlwings':
