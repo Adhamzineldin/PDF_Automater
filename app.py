@@ -152,16 +152,9 @@ def generate_pdf():
 @app.route('/download-zips', methods=['GET'])
 def download_zips():
     accapi = ACCAPI()
-    project_name = request.args.get('project_name', 'Information Systems Workspace')  # Default project name
     result = accapi.download_project_zips()
 
     return jsonify(result), result["status_code"]
-
-
-
-
-
-
 
 
 
