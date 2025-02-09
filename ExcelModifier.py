@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import tempfile
-
+from collections.abc import Iterable
 
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
@@ -115,11 +115,16 @@ class ExcelModifier:
     #     print(f"Inserted a new row at {row}.")
 
 
+
     def insert_row(self, row_data, row_index=1):
         """Inserts a row with the given data at the specified row index."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-        
+    
+        if not isinstance(row_data, Iterable):
+            print("Error: row_data is not iterable.")
+            return None
+    
         if self.backend == 'xlwings':
             sheet_api = self.sheet.api
             try:
@@ -141,7 +146,8 @@ class ExcelModifier:
             except Exception as e:
                 print(f"Error inserting row with openpyxl: {e}")
                 return None
-
+            
+    
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
         if self.workbook is None:
