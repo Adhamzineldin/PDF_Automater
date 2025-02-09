@@ -150,7 +150,7 @@ def generate_pdf():
 
 
 @app.route('/download-zips')
-def download_zips(project_name):
+def download_zips():
     """
     Flask route to download all ZIP files in the specified Autodesk Odrive project.
     """
