@@ -277,7 +277,7 @@ class ACCAPI:
         :return: List of downloaded .zip file paths.
         """
         home_dir = os.path.expanduser("~")
-        project_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files')
+        project_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/Adhams_Server')
         download_path = os.path.join(home_dir, 'Downloads')
     
         if not os.path.exists(project_path):
