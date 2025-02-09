@@ -8,6 +8,7 @@ import zipfile
 
 from flask import Flask, request, send_file, jsonify, Response
 from ACCAPI import ACCAPI
+from ACC_Smart_Forms import generate_smart_form
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
 
@@ -150,6 +151,18 @@ def generate_pdf():
             return jsonify({"error": "PDF generation failed."}), 500
     else:
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
+
+
+@app.route('/generate-equipment-form', methods=['GET'])
+def generate_equipment_form():
+    smart_form_object = generate_smart_form()
+    
+    return "Equipment form generated successfully!"
+
+
+
+
+
 
 
 @app.route('/download-zips')

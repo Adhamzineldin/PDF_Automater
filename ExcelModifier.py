@@ -109,6 +109,11 @@ class ExcelModifier:
                     cell.border = border
         print("Gridlines added to the sheet.")
 
+    def insert_row(self, row):
+        """Inserts a new row using xlwings by shifting down rows manually."""
+        self.sheet.range(f"{row}:{row}").insert(shift="down")
+        print(f"Inserted a new row at {row}.")
+
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
         if self.workbook is None:
@@ -120,10 +125,6 @@ class ExcelModifier:
             self.workbook.save(save_path)
         print(f"Workbook saved at {save_path}")
         return save_path
-
-
-
-
 
     def export_to_pdf(self, payment, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Cost Cover Sheets"):
         """Exports the sheet to a PDF, fitting it to a single page."""
@@ -199,6 +200,76 @@ class ExcelModifier:
                 return None
     
         return pdf_path
+
+
+    def export_to_pdf_no_upload(self, excel_filename="output"):
+        """Exports the sheet to a PDF, fitting it to a single page."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
+        
+        name = f"{excel_filename}"
+        print(name)
+
+        pdf_path = os.path.join(self.modified_folder, name)
+        print(pdf_path)
+
+        if self.backend == 'xlwings':
+            # Windows-specific export using xlwings (unchanged)
+            sheet_api = self.sheet.api
+            sheet_api.PageSetup.FitToPagesWide = 1  # Fit to one page wide
+            sheet_api.PageSetup.FitToPagesTall = 1   # Fit to one page tall
+            sheet_api.PageSetup.Zoom = False         # Disable zoom
+            try:
+                sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
+                print(f"PDF exported at {pdf_path}")
+            except Exception as e:
+                print(f"Error exporting to PDF: {e}")
+                return None
+        else:
+            # For Linux, use LibreOffice in headless mode to convert the saved XLSX to PDF.
+            temp_xlsx = f"modified_files/{excel_filename}.xlsx"
+            # Capture the current working directory
+            original_dir = os.getcwd()
+
+            try:
+                cmd = [
+                        'libreoffice', '--headless',
+                        '--convert-to', 'pdf',
+                        '--outdir', self.modified_folder,
+                        temp_xlsx
+                ]
+
+
+
+                subprocess.run(cmd, check=True)
+
+                # Ensure that the generated PDF has the same name as the input XLSX file.
+                generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+                print(generated_pdf)
+
+                # If the output file already exists, delete it to avoid conflicts.
+                if os.path.exists(pdf_path):
+                    os.remove(pdf_path)
+
+                # Rename the generated PDF to the desired filename (overwrite if exists).
+                os.rename(generated_pdf, pdf_path)
+                print(f"PDF exported at {pdf_path}")
+
+
+                acc_api = ACCAPI()
+
+
+
+                
+
+
+
+            except subprocess.CalledProcessError as e:
+                print(f"Error exporting to PDF via LibreOffice: {e}")
+                return None
+
+        return pdf_path
+    
     
     def insert_svg_as_image(self, svg_code, cell_range):
         """
