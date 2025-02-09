@@ -7,6 +7,8 @@ import queue
 import zipfile
 
 from flask import Flask, request, send_file, jsonify, Response
+from werkzeug.utils import secure_filename
+
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
@@ -164,19 +166,26 @@ def download_zips():
     if not zip_files:
         return jsonify({"error": "No ZIP files found."}), 404
 
-    # Create a temporary ZIP archive
-    temp_zip_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
+    def generate_zip():
+        with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as temp_zip_file:
+            with zipfile.ZipFile(temp_zip_file, "w", zipfile.ZIP_DEFLATED) as temp_zip:
+                for idx, file_path in enumerate(zip_files):
+                    zip_filename = secure_filename(os.path.basename(file_path))
+                    temp_zip.write(file_path, zip_filename)
+                    yield f"Processed file {idx + 1}/{len(zip_files)}\n".encode()  # Progress log
 
-    with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as temp_zip:
-        for file_path in zip_files:
-            zip_filename = os.path.basename(file_path)
-            temp_zip.write(file_path, zip_filename)
+            temp_zip_path = temp_zip_file.name
 
-    # Send the archive to the user
-    response = send_file(temp_zip_path, as_attachment=True, download_name="all_zips.zip")
-    response.call_on_close(lambda: os.remove(temp_zip_path))  # Ensure cleanup after response is sent
+        # Send the ZIP file as a streaming response
+        with open(temp_zip_path, "rb") as f:
+            while chunk := f.read(8192):
+                yield chunk
 
-    return response
+        os.remove(temp_zip_path)  # Cleanup after sending
+
+    return Response(generate_zip(), content_type="application/zip", headers={
+            "Content-Disposition": "attachment; filename=all_zips.zip"
+    })
 
 
 
