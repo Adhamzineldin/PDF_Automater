@@ -306,9 +306,10 @@ class ExcelModifier:
                 cmd = [
                         'libreoffice', '--headless',
                         '--convert-to', 'pdf',
-                        '--outdir', modified_folder_path,
-                        temp_xlsx
+                        '--outdir', os.path.join(current_directory, "modified_files"),
+                        f'"{temp_xlsx}"'
                 ]
+
                 result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print(f"LibreOffice stdout: {result.stdout.decode()}")
                 print(f"LibreOffice stderr: {result.stderr.decode()}")
