@@ -180,7 +180,7 @@ def generate_smart_form():
 
             try:
                 # modifier.save_workbook()  # Save workbook after all rows are processed
-                modifier.export_to_pdf(f"D:\\OneDrive - Square Engineering Firm\\Users\\ABDALLAH.MAMDOUH\Desktop\\exported_test\\{proj} - {date_now}.pdf")
+                modifier.export_to_pdf(f"{proj} - {date_now}.pdf")
 
             except Exception as e:
                 print(f"Error saving workbook: {e}")
