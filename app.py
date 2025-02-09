@@ -149,14 +149,14 @@ def generate_pdf():
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
 
 
-@app.route('/download-zips/<project_name>')
+@app.route('/download-zips')
 def download_zips(project_name):
     """
     Flask route to download all ZIP files in the specified Autodesk Odrive project.
     """
     acc_api = ACCAPI()
     
-    result = acc_api.download_project_zips(project_name)
+    result = acc_api.download_project_zips()
 
     if "error" in result:
         return jsonify(result), result["status_code"]
