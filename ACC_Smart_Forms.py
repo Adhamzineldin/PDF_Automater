@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
@@ -244,6 +245,7 @@ def generate_smart_form():
             try:
                  
                 file_name = f"{proj} - {date_now} Summary"
+                file_name = sanitize_filename(file_name)
                 print(f"Saving workbook as {file_name}.xlsx")
                 modifier.save_workbook(filename=f"{file_name}.xlsx")
                 print(f"Exporting to PDF")
@@ -268,3 +270,5 @@ def generate_smart_form():
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
+def sanitize_filename(filename):
+    return re.sub(r'[^\w\-_\. ]', '_', filename)
