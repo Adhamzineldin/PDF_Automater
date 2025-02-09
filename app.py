@@ -151,26 +151,14 @@ def generate_pdf():
 
 @app.route('/download-zips')
 def download_zips():
-    """
-    Flask route to download all ZIP files in the specified Autodesk Odrive project.
-    """
     acc_api = ACCAPI()
-    
-    result = acc_api.download_project_zips()
+    result = acc_api.download_project_zips("Information Systems Workspace")
 
     if "error" in result:
         return jsonify(result), result["status_code"]
 
-    # Create a generator to send files one by one
-    def generate():
-        for file_path in result["files"]:
-            with open(file_path, "rb") as f:
-                yield f.read()
-
-    response = Response(generate(), content_type="application/zip")
-    response.headers["Content-Disposition"] = f'attachment; filename="Information Systems Workspace_zips.zip"'
-
-    return response
+    # Send the first ZIP file as an example
+    return send_file(result["files"][0], as_attachment=True)
 
 
 
