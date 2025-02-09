@@ -286,7 +286,7 @@ class ACCAPI:
 
 
         # Find all ZIP files in the project directory
-        find_command = f'find "{project_path}" -type f -name "*.zip.cloudf"'
+        find_command = f'find "{project_path}" -type f -name "*.zip.cloud"'
         result = subprocess.run(find_command, shell=True, capture_output=True, text=True)
     
         zip_files = result.stdout.strip().split("\n") if result.stdout else []
