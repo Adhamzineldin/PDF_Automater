@@ -168,7 +168,7 @@ def download_zips():
                 yield f.read()
 
     response = Response(generate(), content_type="application/zip")
-    response.headers["Content-Disposition"] = f'attachment; filename="Information Systems Workspace_zips.zip.cloud"'
+    response.headers["Content-Disposition"] = f'attachment; filename="Information Systems Workspace_zips.zip"'
 
     return response
 

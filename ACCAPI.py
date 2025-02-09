@@ -270,7 +270,8 @@ class ACCAPI:
 
     def download_project_zips(self, project_name="Information Systems Workspace"):
         """
-        Searches for all ZIP files in the specified Autodesk Odrive project and downloads them.
+        Searches for all ZIP files in the specified Autodesk Odrive project, downloads them from the cloud,
+        and sends them as a response.
         
         :param project_name: The name of the project to search for ZIP files.
         """
@@ -280,34 +281,43 @@ class ACCAPI:
     
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
-
+    
+        # Refresh the directory recursively
         refresh_command = f'find "{project_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;'
         subprocess.run(refresh_command, shell=True, check=True)
-
-
-        # Find all ZIP files in the project directory
+    
+        # Find all cloud ZIP files
         find_command = f'find "{project_path}" -type f -name "*.zip.cloud"'
         result = subprocess.run(find_command, shell=True, capture_output=True, text=True)
+        zip_cloud_files = result.stdout.strip().split("\n") if result.stdout else []
     
-        zip_files = result.stdout.strip().split("\n") if result.stdout else []
-    
-        if not zip_files:
+        if not zip_cloud_files:
             return {"error": "No ZIP files found in the project.", "status_code": 404}
     
         # Ensure download folder exists
         os.makedirs(download_path, exist_ok=True)
     
         downloaded_files = []
-        for zip_file in zip_files:
-            zip_filename = os.path.basename(zip_file)
-            local_zip_path = os.path.join(download_path, zip_filename)
     
-            # Copy ZIP file to Downloads
-            shutil.copy(zip_file, local_zip_path)
-            downloaded_files.append(local_zip_path)
+        for cloud_file in zip_cloud_files:
+            if not cloud_file.endswith(".zip.cloud"):
+                continue
+    
+            local_zip_path = cloud_file[:-6]  # Remove ".cloud" to get the actual file name
+    
+            # Trigger Odrive to sync/download the file
+            sync_command = f'~/.odrive-agent/bin/odrive sync "{cloud_file}"'
+            subprocess.run(sync_command, shell=True, check=True)
+    
+            # Wait for the file to be fully downloaded
+            while os.path.exists(cloud_file):  # If .cloud file still exists, wait
+                time.sleep(2)  # Wait before checking again
+    
+            # Move downloaded file to Downloads
+            shutil.copy(local_zip_path, os.path.join(download_path, os.path.basename(local_zip_path)))
+            downloaded_files.append(os.path.join(download_path, os.path.basename(local_zip_path)))
     
         return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}
-        
         
         
         
