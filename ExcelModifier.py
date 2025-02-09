@@ -315,8 +315,8 @@ class ExcelModifier:
                     os.remove(pdf_path)
     
                 # Rename the generated PDF to the desired filename (overwrite if exists).
-                os.rename(generated_pdf, pdf_path)
-                print(f"PDF exported at {pdf_path}")
+                # os.rename(generated_pdf, pdf_path)
+                # print(f"PDF exported at {pdf_path}")
             except subprocess.CalledProcessError as e:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
