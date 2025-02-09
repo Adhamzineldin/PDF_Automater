@@ -261,7 +261,7 @@ class ExcelModifier:
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
-        name = f"{excel_filename}.pdf"  # Ensure .pdf extension is added
+        name = f"{excel_filename}.pdf"  # Add .pdf extension explicitly
         print(f"Name for PDF: {name}")
     
         pdf_path = os.path.join(self.modified_folder, name)
