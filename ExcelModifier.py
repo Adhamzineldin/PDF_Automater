@@ -141,7 +141,8 @@ class ExcelModifier:
             self.sheet.range(f"{row}:{row}").insert(shift="down")
             print(f"Inserted a new row at {row}.")
         else:
-    
+            self.sheet.insert_rows(row)
+            
             if row > 1:
                 for col in range(1, self.sheet.max_column + 1):
                     cell_above = self.sheet.cell(row=row - 2, column=col)
@@ -173,8 +174,6 @@ class ExcelModifier:
                                 wrap_text=cell_above.alignment.wrap_text
                         )
                         new_cell.number_format = cell_above.number_format
-
-            self.sheet.insert_rows(row)
 
 
     def save_workbook(self, filename='modified.xlsx'):
