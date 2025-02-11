@@ -134,9 +134,24 @@ class ExcelModifier:
 
 
     def insert_row(self, row):
+        """Inserts a new row and copies the styling from the row above."""
         self.sheet.insert_rows(row)
-        print(f"Inserted a new row at {row}.")
-
+    
+        # Copy styling from the row above
+        if row > 1:
+            for col in range(1, self.sheet.max_column + 1):
+                cell_above = self.sheet.cell(row=row - 1, column=col)
+                new_cell = self.sheet.cell(row=row, column=col)
+    
+                # Copy style attributes
+                if cell_above.has_style:
+                    new_cell.font = cell_above.font
+                    new_cell.fill = cell_above.fill
+                    new_cell.border = cell_above.border
+                    new_cell.alignment = cell_above.alignment
+                    new_cell.number_format = cell_above.number_format
+    
+        print(f"Inserted a new row at {row} with styling copied from the row above.")
 
 
     def save_workbook(self, filename='modified.xlsx'):
