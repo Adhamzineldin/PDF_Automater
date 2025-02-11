@@ -133,7 +133,7 @@ class ExcelModifier:
     #     print(f"Inserted a new row at {row}.")
 
 
-    def insert_row_openpyxl(self, row):
+    def insert_row(self, row):
         self.sheet.insert_rows(row)
         print(f"Inserted a new row at {row}.")
 
