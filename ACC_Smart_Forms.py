@@ -182,7 +182,22 @@ def generate_smart_form():
 
             try:
                 # modifier.save_workbook()  # Save workbook after all rows are processed
-                modifier.export_to_pdf_no_upload(excel_filename=f"{proj} - {date_now}")
+                # modifier.export_to_pdf_no_upload(excel_filename=f"{proj} - {date_now}")
+                modifier.modified_folder = "modified_files"
+                file_name = f"{proj} - {date_now}"
+                file_name = re.sub(r"[^\w\s]", "", file_name)
+                file_name = re.sub(r"\s+", "_", file_name).strip("_")
+
+                print(f"Saving workbook as {file_name}.xlsx")
+                modifier.save_workbook(filename=f"{file_name}.xlsx")
+                print(f"Exporting to PDF")
+                print("-" * 40)
+                modifier.export_to_pdf_no_upload(excel_filename=file_name)
+                print(f"uploading  PDF")
+                print("-" * 40)
+                print(proj)
+                pdf_path = os.path.join(modifier.modified_folder, file_name)
+                acc_api.upload_equipment_pdf_to_acc(pdf_path=f"modified_files/{file_name}.pdf", filename=f"{file_name}", folder_name=f"Equipment/{proj}")
 
             except Exception as e:
                 print(f"Error saving workbook: {e}")
