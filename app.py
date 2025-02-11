@@ -8,7 +8,7 @@ import zipfile
 
 from flask import Flask, request, send_file, jsonify, Response
 from ACCAPI import ACCAPI
-from sections_functions.ACC_Smart_Forms import generate_smart_form
+from ACC_Smart_Forms import generate_smart_form
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
 
