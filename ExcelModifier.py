@@ -139,7 +139,7 @@ class ExcelModifier:
         self.sheet.insert_rows(row)
 
         # Copy styling from the row above
-        if row > 1:
+        if row > 7:
             for col in range(1, self.sheet.max_column + 1):
                 cell_above = self.sheet.cell(row=row - 1, column=col)
                 new_cell = self.sheet.cell(row=row, column=col)
