@@ -142,6 +142,10 @@ class ExcelModifier:
             print(f"Inserted a new row at {row}.")
         else:
             self.sheet.insert_rows(row)
+
+            print(f"Before Inserting Row {row}:")
+            for col in range(1, self.sheet.max_column + 1):
+                print(f"  Col {col}: {self.sheet.cell(row=row, column=col).value}")
             
             if row > 1:
                 for col in range(1, self.sheet.max_column + 1):
