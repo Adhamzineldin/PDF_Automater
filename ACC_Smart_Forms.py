@@ -30,7 +30,7 @@ def generate_smart_form():
         previous_month_abbr = datetime(previous_year, previous_month, 1).strftime("%b")  # Abbreviated month name
 
         # Dynamic API call example
-        endpoint = f"construction/forms/v1/projects/{acc_api.CONTAINER_ID}/forms?formDateMin={datetime.now().strftime("%b")} 6, {datetime.now().year}&templateId=3c852249-47f5-4234-987a-06b2717ba550"
+        endpoint = f"construction/forms/v1/projects/{acc_api.CONTAINER_ID}/forms?formDateMin={datetime.now().strftime("%b")} 1, {datetime.now().year}&templateId=42a91d54-4ec2-4f5e-b17d-c18898036405"
         result = acc_api.call_api(endpoint)
         if not result["data"]:
             endpoint = f"construction/forms/v1/projects/{acc_api.CONTAINER_ID}/forms?formDateMin={previous_month_abbr} 1, {datetime.now().year}"
