@@ -157,7 +157,7 @@ def generate_pdf():
 def generate_equipment_form():
     smart_form_object = generate_smart_form()
     
-    return Response(status=200)
+    return "Equipment form generated successfully! Might take a while to reflect in the ACC."
 
 
 
