@@ -160,11 +160,6 @@ def generate_equipment_form():
     return "Equipment form generated successfully! Might take a while to reflect in the ACC."
 
 
-
-
-
-
-
 @app.route('/download-zips')
 def download_zips():
     acc_api = ACCAPI()
