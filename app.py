@@ -157,7 +157,7 @@ def generate_pdf():
 def generate_equipment_form():
     smart_form_object = generate_smart_form()
     
-    return {"status_code": 200}
+    return None
 
 
 
