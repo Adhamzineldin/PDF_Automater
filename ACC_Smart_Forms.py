@@ -1,3 +1,4 @@
+import os
 import re
 from datetime import datetime
 from ACCAPI import ACCAPI
@@ -254,6 +255,7 @@ def generate_smart_form():
                 print(f"uploading  PDF")
                 print("-" * 40)
                 print(proj)
+                pdf_path = os.path.join(modifier.modified_folder, file_name)
                 acc_api.upload_pdf_to_acc(pdf_path=f"modified_files/{file_name}.pdf", filename=f"{file_name}", folder_name=f"Equipment/{proj}")
                 
                 
