@@ -246,7 +246,8 @@ def generate_smart_form():
             try:
                 modifier.modified_folder = "modified_files"
                 file_name = f"{proj} - {date_now} Summary"
-                file_name = sanitize_filename(file_name)
+                file_name = re.sub(r"[^\w.-]", "_", file_name)
+                
                 print(f"Saving workbook as {file_name}.xlsx")
                 modifier.save_workbook(filename=f"{file_name}.xlsx")
                 print(f"Exporting to PDF")
