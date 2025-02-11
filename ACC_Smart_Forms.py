@@ -253,6 +253,7 @@ def generate_smart_form():
                 modifier.export_to_pdf_no_upload(excel_filename=file_name)
                 print(f"uploading  PDF")
                 print("-" * 40)
+                print(proj)
                 acc_api.upload_pdf_to_acc(pdf_path=f"modified_files/{file_name}.pdf", filename=f"{file_name}", folder_name=f"Equipment/{proj}")
                 
                 

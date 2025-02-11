@@ -293,7 +293,7 @@ class ExcelModifier:
             cmd = [
                     'libreoffice', '--headless',
                     '--convert-to', 'pdf',
-                    '--outdir', modified_folder_path,
+                    '--outdir', self.modified_folder,
                     temp_xlsx  # No quotes needed; subprocess handles spaces
             ]
             result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
