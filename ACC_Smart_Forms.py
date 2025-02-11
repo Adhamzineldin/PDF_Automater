@@ -229,7 +229,7 @@ def generate_smart_form():
             for _, row in df_project.iterrows():
                 print(f"Modifying row {m} with data: {row}")  # Check the row data before modifying
 
-                if m >= 8:  # Ensuring it doesn't insert too early
+                if m >= 7:  # Ensuring it doesn't insert too early
                     modifier.insert_row(m)
 
                 # Ensure all required columns have data
