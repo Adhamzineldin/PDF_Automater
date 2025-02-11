@@ -184,9 +184,8 @@ def generate_smart_form():
                 # modifier.save_workbook()  # Save workbook after all rows are processed
                 # modifier.export_to_pdf_no_upload(excel_filename=f"{proj} - {date_now}")
                 modifier.modified_folder = "modified_files"
-                file_name = f"{proj} - {date_now}"
-                file_name = re.sub(r"[^\w\s]", "", file_name)
-                file_name = re.sub(r"\s+", "_", file_name).strip("_")
+                date_now = datetime.now().strftime("%A, %B %d, %Y")  # Format: Tuesday, February 11, 2025
+                file_name = f"Equipment ({date_now})"
 
                 print(f"Saving workbook as {file_name}.xlsx")
                 modifier.save_workbook(filename=f"{file_name}.xlsx")
@@ -260,9 +259,8 @@ def generate_smart_form():
 
             try:
                 modifier.modified_folder = "modified_files"
-                file_name = f"{proj} - {date_now} Summary"
-                file_name = re.sub(r"[^\w\s]", "", file_name)
-                file_name = re.sub(r"\s+", "_", file_name).strip("_")
+                date_now = datetime.now().strftime("%A, %B %d, %Y")  # Format: Tuesday, February 11, 2025
+                file_name = f"Equipment Summary ({date_now})"
                 
                 print(f"Saving workbook as {file_name}.xlsx")
                 modifier.save_workbook(filename=f"{file_name}.xlsx")
