@@ -157,7 +157,7 @@ def generate_pdf():
 def generate_equipment_form():
     smart_form_object = generate_smart_form()
     
-    return 200
+    return Response("200", status=200, mimetype='text/plain')
 
 
 
