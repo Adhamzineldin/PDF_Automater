@@ -229,6 +229,9 @@ def generate_smart_form():
             for _, row in df_project.iterrows():
                 print(f"Modifying row {m} with data: {row}")  # Check the row data before modifying
 
+                if m >= 8:  # Ensuring it doesn't insert too early
+                    modifier.insert_row(m)
+
                 # Ensure all required columns have data
                 if not pd.isnull(row["project_name"]):
                     # Modify cells only if data is available
@@ -251,8 +254,7 @@ def generate_smart_form():
                     print(f"Skipping row {m} due to missing data")
 
                 # Insert a new row if necessary
-                if m >= 8:  # Ensuring it doesn't insert too early
-                    modifier.insert_row(m)
+                
 
             modifier.modify_cell(f'L{m + 2}', f"=SUM(L7:L{m})")
 
