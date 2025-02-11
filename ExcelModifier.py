@@ -133,13 +133,13 @@ class ExcelModifier:
     #     print(f"Inserted a new row at {row}.")
 
 
-
+    
     def insert_row(self, row_data, row_index=1):
-        """Inserts a row with the given data at the specified row index."""
+        """Inserts a new row in openpyxl while copying styles from the row above."""
+    
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
-        # Ensure row_data is an iterable (like list or tuple)
         if not isinstance(row_data, Iterable):
             print("Error: row_data is not iterable.")
             return None
@@ -147,7 +147,6 @@ class ExcelModifier:
         if self.backend == 'xlwings':
             sheet_api = self.sheet.api
             try:
-                # Insert row using xlwings API
                 sheet_api.Rows(row_index).Insert()
                 for col, value in enumerate(row_data, 1):
                     sheet_api.Cells(row_index, col).Value = value
@@ -155,14 +154,31 @@ class ExcelModifier:
             except Exception as e:
                 print(f"Error inserting row with xlwings: {e}")
                 return None
-        else:  # Assuming openpyxl as default
+        else:  # openpyxl implementation
             try:
-                # Insert row using openpyxl
+                # Insert new row (shifts rows down)
                 self.sheet.insert_rows(row_index)
+    
+                # Copy styles from the row above
+                if row_index > 1:  # Ensure it's not the first row
+                    for col in range(1, self.sheet.max_column + 1):
+                        above_cell = self.sheet.cell(row=row_index - 1, column=col)
+                        new_cell = self.sheet.cell(row=row_index, column=col)
+    
+                        # Copy styles
+                        if above_cell.has_style:
+                            new_cell.font = above_cell.font
+                            new_cell.fill = above_cell.fill
+                            new_cell.border = above_cell.border
+                            new_cell.alignment = above_cell.alignment
+                            new_cell.number_format = above_cell.number_format
+    
+                # Insert row data
                 for col, value in enumerate(row_data, 1):
-                    # Ensure we're inserting values into the correct cell
                     self.sheet.cell(row=row_index, column=col).value = value
+               
                 print(f"Row inserted at {row_index} with data: {row_data}")
+    
             except Exception as e:
                 print(f"Error inserting row with openpyxl: {e}")
                 return None
