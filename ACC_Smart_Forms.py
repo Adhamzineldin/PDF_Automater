@@ -252,8 +252,8 @@ def generate_smart_form():
                     print(f"Skipping row {m} due to missing data")
 
                 # Insert a new row if necessary
-                # if m >= 7:  # Ensuring it doesn't insert too early
-                #     modifier.insert_row(m)
+                if m >= 7:  # Ensuring it doesn't insert too early
+                    modifier.insert_row(m)
 
 
             modifier.modify_cell(f'L{m + 2}', f"=SUM(L7:L{m})")
