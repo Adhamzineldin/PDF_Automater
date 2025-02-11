@@ -133,10 +133,10 @@ class ExcelModifier:
     #     print(f"Inserted a new row at {row}.")
 
 
-    
+
     def insert_row(self, row_data, row_index=1):
-        """Inserts a new row in openpyxl while copying styles from the row above."""
-    
+        """Inserts a new row in openpyxl while preserving the styling from the row above."""
+
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
     
@@ -156,33 +156,56 @@ class ExcelModifier:
                 return None
         else:  # openpyxl implementation
             try:
-                # Insert new row (shifts rows down)
+                # Store merged cell info before inserting a row
+                merged_ranges = list(self.sheet.merged_cells)
+    
+                # Insert a new row (shifts rows below)
                 self.sheet.insert_rows(row_index)
     
-                # Copy styles from the row above
+                # Copy styles from the row above (row_index - 1)
                 if row_index > 1:  # Ensure it's not the first row
                     for col in range(1, self.sheet.max_column + 1):
                         above_cell = self.sheet.cell(row=row_index - 1, column=col)
                         new_cell = self.sheet.cell(row=row_index, column=col)
     
                         # Copy styles
-                        if above_cell.has_style:
-                            new_cell.font = above_cell.font
-                            new_cell.fill = above_cell.fill
-                            new_cell.border = above_cell.border
-                            new_cell.alignment = above_cell.alignment
-                            new_cell.number_format = above_cell.number_format
+                        new_cell.font = above_cell.font
+                        new_cell.fill = above_cell.fill
+                        new_cell.border = above_cell.border
+                        new_cell.alignment = above_cell.alignment
+                        new_cell.number_format = above_cell.number_format
+    
+                # Restore merged cells
+                for merged_range in merged_ranges:
+                    min_row, min_col, max_row, max_col = (
+                            merged_range.min_row, merged_range.min_col,
+                            merged_range.max_row, merged_range.max_col
+                    )
+    
+                    # If the merged range is below the inserted row, shift it down
+                    if min_row >= row_index:
+                        self.sheet.unmerge_cells(start_row=min_row, start_column=min_col,
+                                                 end_row=max_row, end_column=max_col)
+                        self.sheet.merge_cells(start_row=min_row + 1, start_column=min_col,
+                                               end_row=max_row + 1, end_column=max_col)
+    
+                # Copy column widths
+                for col in range(1, self.sheet.max_column + 1):
+                    col_letter = get_column_letter(col)
+                    self.sheet.column_dimensions[col_letter].width = self.sheet.column_dimensions[col_letter].width
     
                 # Insert row data
                 for col, value in enumerate(row_data, 1):
                     self.sheet.cell(row=row_index, column=col).value = value
-               
-                print(f"Row inserted at {row_index} with data: {row_data}")
+    
+                # Save workbook
+                self.workbook.save("your_file.xlsx")
+    
+                print(f"Row inserted at {row_index} with data: {row_data}, keeping formatting!")
     
             except Exception as e:
                 print(f"Error inserting row with openpyxl: {e}")
                 return None
-
 
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
