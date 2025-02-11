@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 from collections.abc import Iterable
 
+from openpyxl.styles import Font, PatternFill, Border, Alignment
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
 
@@ -134,24 +135,41 @@ class ExcelModifier:
 
 
     def insert_row(self, row):
-        """Inserts a new row and copies the styling from the row above."""
+        """Inserts a new row and copies styling from the row above."""
         self.sheet.insert_rows(row)
-    
+
         # Copy styling from the row above
         if row > 1:
             for col in range(1, self.sheet.max_column + 1):
                 cell_above = self.sheet.cell(row=row - 1, column=col)
                 new_cell = self.sheet.cell(row=row, column=col)
-    
-                # Copy style attributes
+
                 if cell_above.has_style:
-                    new_cell.font = cell_above.font
-                    new_cell.fill = cell_above.fill
-                    new_cell.border = cell_above.border
-                    new_cell.alignment = cell_above.alignment
+                    new_cell.font = Font(
+                            name=cell_above.font.name,
+                            size=cell_above.font.size,
+                            bold=cell_above.font.bold,
+                            italic=cell_above.font.italic,
+                            underline=cell_above.font.underline,
+                            color=cell_above.font.color
+                    )
+                    new_cell.fill = PatternFill(
+                            fill_type=cell_above.fill.fill_type,
+                            start_color=cell_above.fill.start_color,
+                            end_color=cell_above.fill.end_color
+                    )
+                    new_cell.border = Border(
+                            left=cell_above.border.left,
+                            right=cell_above.border.right,
+                            top=cell_above.border.top,
+                            bottom=cell_above.border.bottom
+                    )
+                    new_cell.alignment = Alignment(
+                            horizontal=cell_above.alignment.horizontal,
+                            vertical=cell_above.alignment.vertical,
+                            wrap_text=cell_above.alignment.wrap_text
+                    )
                     new_cell.number_format = cell_above.number_format
-    
-        print(f"Inserted a new row at {row} with styling copied from the row above.")
 
 
     def save_workbook(self, filename='modified.xlsx'):
