@@ -209,7 +209,7 @@ class ACCAPI:
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
 
-        pdf_path = os.path.join(original_dir, f"modified_folder/{filename}.pdf")
+        pdf_path = os.path.join(original_dir, f"modified_files/{filename}.pdf")
     
         # Ensure the target directory exists, if not, create it
         project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
