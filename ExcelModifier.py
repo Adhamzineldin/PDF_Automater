@@ -145,7 +145,7 @@ class ExcelModifier:
             
             if row > 1:
                 for col in range(1, self.sheet.max_column + 1):
-                    cell_above = self.sheet.cell(row=row - 1, column=col)
+                    cell_above = self.sheet.cell(row=row - 2, column=col)
                     new_cell = self.sheet.cell(row=row, column=col)
     
                     if cell_above.has_style:
