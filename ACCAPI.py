@@ -201,7 +201,7 @@ class ACCAPI:
        
     
         # Define the new PDF path
-        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename}.pdf')
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename.split('_')[0]}/{filename}.pdf')
     
     
         server_folder_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}')
@@ -209,7 +209,6 @@ class ACCAPI:
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
 
-        pdf_path = os.path.join(original_dir, f"modified_files/{filename}.pdf")
     
         # Ensure the target directory exists, if not, create it
         project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
@@ -270,6 +269,92 @@ class ACCAPI:
         # Change back to the original working directory
         os.chdir(original_dir)
         print(f"Changed back to the original working directory: {original_dir}")
+
+    def upload_equipment_pdf_to_acc(self, pdf_path, filename, project_name="Information Systems Workspace", folder_name="Cost Cover Sheets"):
+        """
+        Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
+    
+        :param project_name: 
+        :param folder_name: 
+        :param pdf_path: The path to the generated PDF.
+        :param filename: The filename to save the PDF as (without extension).
+        """
+        # Get the user's home directory path
+        home_dir = os.path.expanduser("~")
+
+
+
+        # Define the new PDF path
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename}.pdf')
+
+
+        server_folder_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}')
+
+        # Save the current working directory to return to it later
+        original_dir = os.getcwd()
+
+        pdf_path = os.path.join(original_dir, f"modified_files/{filename}.pdf")
+
+        # Ensure the target directory exists, if not, create it
+        project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
+        adham_server_dir = os.path.dirname(new_pdf_path)
+
+        if not os.path.exists(project_files_dir):
+            print("Syncing Project Files directory...")
+            os.makedirs(adham_server_dir)
+            print(f"Directory {adham_server_dir} created.")
+
+            # Change the current working directory to the folder containing the PDF
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+
+            find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)
+        elif not os.path.exists(adham_server_dir):
+            print("Syncing Adham Server directory...")
+
+            os.makedirs(adham_server_dir)
+
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+
+
+
+            find_command = f'find "{server_folder_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)
+
+
+        # If the output file already exists, delete it to avoid conflicts
+        if os.path.exists(new_pdf_path):
+            os.remove(new_pdf_path)
+
+        # Use the 'cp' command to copy the generated PDF to the new location
+        subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
+
+        # Change the current working directory to the folder containing the PDF
+        os.chdir(adham_server_dir)
+
+        # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+        subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+        print(f"PDF also exported at {new_pdf_path}")
+
+        # Change back to the original working directory
+        os.chdir(original_dir)
+        print(f"Changed back to the original working directory: {original_dir}")
+
 
 
     def download_project_zips(self, project_name="Information Systems Workspace"):

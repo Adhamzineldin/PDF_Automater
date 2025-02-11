@@ -258,7 +258,7 @@ def generate_smart_form():
                 print("-" * 40)
                 print(proj)
                 pdf_path = os.path.join(modifier.modified_folder, file_name)
-                acc_api.upload_pdf_to_acc(pdf_path=f"modified_files/{file_name}.pdf", filename=f"{file_name}", folder_name=f"Equipment/{proj}")
+                acc_api.upload_equipment_pdf_to_acc(pdf_path=f"modified_files/{file_name}.pdf", filename=f"{file_name}", folder_name=f"Equipment/{proj}")
                 
                 
                 # modifier.save_workbook(filename=f"{file_name}.xlsx")  
