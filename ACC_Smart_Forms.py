@@ -252,7 +252,7 @@ def generate_smart_form():
                     print(f"Skipping row {m} due to missing data")
 
                 # Insert a new row if necessary
-                if m >= 7:  # Ensuring it doesn't insert too early
+                if m >= 8:  # Ensuring it doesn't insert too early
                     modifier.insert_row(m)
 
 
