@@ -187,7 +187,7 @@ def download_zips():
     return response
 
 
-@app.route('/get-zips', methods=['POST'])
+@app.route('/get-zips', methods=['POST', 'GET'])
 def get_zips():
     
     data = request.get_json()
