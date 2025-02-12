@@ -189,31 +189,37 @@ def download_zips():
 
 @app.route('/get-zips', methods=['POST', 'GET'])
 def get_zips():
-    
-    data = request.get_json()
-    url = data.get('url')
+    if request.method == 'POST':
+        data = request.get_json(silent=True)  # Avoids error if JSON is missing
+        if not data:
+            return jsonify({"error": "Invalid or missing JSON", "status_code": 400}), 400
+        url = data.get('url')
+
+    elif request.method == 'GET':
+        url = request.args.get('url')  # Get URL from query parameters
+
     if not url:
-        return {"error": "URL not provided", "status_code": 400}
+        return jsonify({"error": "URL not provided", "status_code": 400}), 400
 
     print(f"Processing request for URL: {url}")
 
     # Extract Project ID using regex
-    project_id = None
     pattern = r"projects/([a-f0-9-]{36})"
     match = re.search(pattern, url)
-    if match:
-        project_id = match.group(1)
-    else:
-        return {"error": "Project ID not found in the URL", "status_code": 400}
+    if not match:
+        return jsonify({"error": "Project ID not found in the URL", "status_code": 400}), 400
+
+    project_id = match.group(1)
 
     acc_api = ACCAPI()
+    project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
 
-    project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}") 
     if project is None:
         result = acc_api.get_project_zip_files()
     else:
         result = acc_api.get_project_zip_files(project["name"])
         print(project["name"])
+
     return jsonify(result)
 
 
