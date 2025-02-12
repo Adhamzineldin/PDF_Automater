@@ -187,10 +187,27 @@ def download_zips():
     return response
 
 
-@app.route('/get-zips')
-def get_zips():
+@app.route('/get-zips', methods=['POST'])
+def get_zips(data):
+    url = data.get('url')
+    if not url:
+        return {"error": "URL not provided", "status_code": 400}
+
+    print(f"Processing request for URL: {url}")
+
+    # Extract Project ID using regex
+    project_id = None
+    pattern = r"projects/([a-f0-9-]{36})"
+    match = re.search(pattern, url)
+    if match:
+        project_id = match.group(1)
+    else:
+        return {"error": "Project ID not found in the URL", "status_code": 400}
+
     acc_api = ACCAPI()
-    result = acc_api.get_project_zip_files("Information Systems Workspace")
+
+    project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}") 
+    result = acc_api.get_project_zip_files(project["name"])
     return jsonify(result)
 
 
