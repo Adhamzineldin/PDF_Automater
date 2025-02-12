@@ -213,6 +213,7 @@ def get_zips():
         result = acc_api.get_project_zip_files()
     else:
         result = acc_api.get_project_zip_files(project["name"])
+        print(project["name"])
     return jsonify(result)
 
 
