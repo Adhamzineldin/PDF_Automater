@@ -6,7 +6,7 @@ import threading
 import queue
 import zipfile
 
-from flask import Flask, request, send_file, jsonify, Response
+from flask import Flask, request, send_file, jsonify, Response, make_response
 from ACCAPI import ACCAPI
 from ACC_Smart_Forms import generate_smart_form
 from ExcelModifier import ExcelModifier
@@ -210,7 +210,9 @@ def get_zips():
 
     project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}") 
     result = acc_api.get_project_zip_files(project["name"])
-    return jsonify(result), 200, {"Content-Type": "application/json"}
+    response = make_response(jsonify(result))
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 
 @app.route('/health_check_upstream1')
