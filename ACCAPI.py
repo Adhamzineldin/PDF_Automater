@@ -453,7 +453,7 @@ class ACCAPI:
         if not compressed_files or compressed_files == ['']:
             return {"error": "No compressed files found in the project.", "status_code": 404}
     
-        return {"message": "Compressed files found successfully.", "files": compressed_files, "status_code": 200}
+        return {"message": "Compressed files found successfully.", "files": compressed_files, "count": len(compressed_files) ,"status_code": 200}
 
     def call_api(self, endpoint, params=None):
         # Load the refresh token
