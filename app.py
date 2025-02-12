@@ -188,7 +188,9 @@ def download_zips():
 
 
 @app.route('/get-zips', methods=['POST'])
-def get_zips(data):
+def get_zips():
+    
+    data = request.get_json()
     url = data.get('url')
     if not url:
         return {"error": "URL not provided", "status_code": 400}
