@@ -210,7 +210,7 @@ def get_zips():
 
     project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}") 
     result = acc_api.get_project_zip_files(project["name"])
-    return jsonify(result)
+    return jsonify(result), 200, {"Content-Type": "application/json"}
 
 
 @app.route('/health_check_upstream1')
