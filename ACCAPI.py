@@ -430,7 +430,7 @@ class ACCAPI:
         in the Autodesk Odrive project directory without syncing or downloading them.
     
         :param project_name: The name of the project to search for compressed files.
-        :return: Dictionary containing file paths or an error message.
+        :return: Dictionary containing file paths relative to the project directory or an error message.
         """
         home_dir = os.path.expanduser("~")
         base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
@@ -453,8 +453,15 @@ class ACCAPI:
         if not compressed_files or compressed_files == ['']:
             return {"error": "No compressed files found in the project.", "status_code": 404}
     
-        return {"message": "Compressed files found successfully.", "files": compressed_files, "count": len(compressed_files) ,"status_code": 200}
-
+        # Convert absolute paths to relative paths
+        relative_files = [os.path.relpath(file, base_path) for file in compressed_files]
+    
+        return {
+                "message": "Compressed files found successfully.",
+                "files": relative_files,
+                "count": len(relative_files),
+                "status_code": 200
+        }
     def call_api(self, endpoint, params=None):
         # Load the refresh token
         refresh_token = self.load_refresh_token()
