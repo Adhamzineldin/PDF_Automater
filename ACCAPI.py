@@ -446,23 +446,29 @@ class ACCAPI:
                 f'-o -iname "*.rar" -o -iname "*.rar.cloud" '
                 f'-o -iname "*.7z" -o -iname "*.7z.cloud" \\)'
         )
-    
+
         result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
         compressed_files = result.stdout.strip().split("\n") if result.stdout else []
-    
+        
         if not compressed_files or compressed_files == ['']:
             return {"error": "No compressed files found in the project.", "status_code": 404}
-    
-        # Convert absolute paths to relative paths
-        relative_files = [os.path.relpath(file, base_path) for file in compressed_files]
-    
+        
+        # Convert absolute paths to relative paths and replace .cloud extensions
+        relative_files = [
+                os.path.relpath(file, base_path).replace(".zip.cloud", ".zip")
+                .replace(".rar.cloud", ".rar")
+                .replace(".7z.cloud", ".7z")
+                for file in compressed_files
+        ]
+        
         return {
                 "message": "Compressed files found successfully.",
                 "files": relative_files,
                 "count": len(relative_files),
                 "status_code": 200
         }
-    def call_api(self, endpoint, params=None):
+
+def call_api(self, endpoint, params=None):
         # Load the refresh token
         refresh_token = self.load_refresh_token()
 
