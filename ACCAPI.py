@@ -444,8 +444,10 @@ class ACCAPI:
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
     
-        # Build find command dynamically based on file_types
+        # Build find command dynamically (case-insensitive)
         find_conditions = " -o ".join([f'-iname "*.{ext}" -o -iname "*.{ext}.cloud"' for ext in file_types])
+        find_conditions += " -o " + " -o ".join([f'-iname "*.{ext.upper()}" -o -iname "*.{ext.upper()}.cloud"' for ext in file_types])
+    
         find_compressed_command = f'find "{project_path}" -type f \\( {find_conditions} \\)'
     
         result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
@@ -461,13 +463,13 @@ class ACCAPI:
         for file in compressed_files:
             rel_path = os.path.relpath(file, base_path)
     
-            # Normalize file extensions by replacing .cloud versions
-            for ext in file_types:
-                if rel_path.endswith(f".{ext}.cloud"):
-                    rel_path = rel_path.replace(f".{ext}.cloud", f".{ext}")
-                if rel_path.endswith(f".{ext}"):
-                    file_counts[ext] += 1
-                    break  # Ensure we count each file once
+            # Normalize file extensions (.cloud and uppercase handling)
+            for ext in file_types + [ext.upper() for ext in file_types]:
+                if rel_path.lower().endswith(f".{ext.lower()}.cloud"):
+                    rel_path = rel_path[:-(len(ext) + 6)] + f".{ext.lower()}"  # Replace .cloud
+                if rel_path.lower().endswith(f".{ext.lower()}"):
+                    file_counts[ext.lower()] += 1
+                    break  # Ensure each file is counted only once
     
             relative_files.append(rel_path)
     
