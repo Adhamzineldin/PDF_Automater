@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 import time
+from collections import defaultdict
 
 from dotenv import load_dotenv
 from urllib.parse import urlencode
