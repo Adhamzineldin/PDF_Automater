@@ -440,13 +440,13 @@ class ACCAPI:
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
     
         # Find all compressed files (including .cloud placeholders)
-        # find_compressed_command = (
-        #         f'find "{project_path}" -type f '
-        #         f'\\( -iname "*.zip" -o -iname "*.zip.cloud" '
-        #         f'-o -iname "*.rar" -o -iname "*.rar.cloud" '
-        #         f'-o -iname "*.7z" -o -iname "*.7z.cloud" \\)'
-        # )
-        find_compressed_command = f'find "{project_path}" -type f \\( -iname "*.rar" -o -iname "*.rar.cloud" \\)'
+        find_compressed_command = (
+                f'find "{project_path}" -type f '
+                f'\\( -iname "*.zip" -o -iname "*.zip.cloud" '
+                f'-o -iname "*.rar" -o -iname "*.rar.cloud" '
+                f'-o -iname "*.7z" -o -iname "*.7z.cloud" \\)'
+        )
+        # find_compressed_command = f'find "{project_path}" -type f \\( -iname "*.zip" -o -iname "*.zip.cloud" \\)'
 
         result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
         compressed_files = result.stdout.strip().split("\n") if result.stdout else []
