@@ -432,10 +432,10 @@ class ACCAPI:
     
         :param project_name: The name of the project to search for compressed files.
         :param file_types: List of file extensions to search for (e.g., ["zip", "rar", "7z"])
-        :return: Dictionary containing file paths relative to the project directory or an error message.
+        :return: Dictionary containing file paths relative to the project directory and file counts.
         """
         if file_types is None:
-            file_types = ["zip", "rar", "7z"]
+            file_types = ["zip", "rar", "7z"]  # Default file types
     
         home_dir = os.path.expanduser("~")
         base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
@@ -444,9 +444,9 @@ class ACCAPI:
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
     
-        # Construct find command dynamically based on provided file types
-        find_conditions = " -o ".join([f"-iname '*.{ext}' -o -iname '*.{ext}.cloud'" for ext in file_types])
-        find_compressed_command = f'find "{project_path}" -type f \( {find_conditions} \)'
+        # Build find command dynamically based on file_types
+        find_conditions = " -o ".join([f'-iname "*.{ext}" -o -iname "*.{ext}.cloud"' for ext in file_types])
+        find_compressed_command = f'find "{project_path}" -type f \\( {find_conditions} \\)'
     
         result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
         compressed_files = result.stdout.strip().split("\n") if result.stdout else []
@@ -454,24 +454,29 @@ class ACCAPI:
         if not compressed_files or compressed_files == ['']:
             return {"error": "No compressed files found in the project.", "status_code": 404}
     
-        # Convert absolute paths to relative paths and replace .cloud extensions
-        relative_files = []
+        # Dictionary to store count of each file type
         file_counts = defaultdict(int)
+        relative_files = []
     
         for file in compressed_files:
             rel_path = os.path.relpath(file, base_path)
+    
+            # Normalize file extensions by replacing .cloud versions
             for ext in file_types:
                 if rel_path.endswith(f".{ext}.cloud"):
                     rel_path = rel_path.replace(f".{ext}.cloud", f".{ext}")
                 if rel_path.endswith(f".{ext}"):
                     file_counts[ext] += 1
-                    break
+                    break  # Ensure we count each file once
+    
             relative_files.append(rel_path)
+    
+        total_files = sum(file_counts.values())
     
         return {
                 "message": "Compressed files found successfully.",
                 "files": relative_files,
-                "count": len(relative_files),
+                "count": total_files,
                 "file_counts": dict(file_counts),
                 "status_code": 200
         }
