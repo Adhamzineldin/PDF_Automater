@@ -459,7 +459,7 @@ class ACCAPI:
         # Dictionary to store count of each file type
         file_counts = defaultdict(int)
         relative_files = []
-    
+        print(f"Found {len(compressed_files)} compressed files in the project.")
         for file in compressed_files:
             rel_path = os.path.relpath(file, base_path)
     
