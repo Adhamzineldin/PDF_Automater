@@ -214,9 +214,9 @@ def get_zips():
     
 
     if project is None:
-        result = acc_api.get_project_zip_files()
+        result = acc_api.get_project_files(file_types=["zip", "rar", "7z"])
     else:
-        result = acc_api.get_project_zip_files(project["name"])
+        result = acc_api.get_project_files(project["name"], file_types=["zip", "rar", "7z"])
         print(project["name"])
 
     return jsonify(result)

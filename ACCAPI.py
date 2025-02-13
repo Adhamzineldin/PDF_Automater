@@ -424,14 +424,18 @@ class ACCAPI:
 
     # Dynamic function to call any Autodesk API endpoint and return the unfiltered response
 
-    def get_project_zip_files(self, project_name="Information Systems Workspace"):
+    def get_project_files(self, project_name="Information Systems Workspace", file_types=None):
         """
-        Searches for all compressed files (.zip, .zip.cloud, .rar, .rar.cloud, .7z, .7z.cloud, etc.)
-        in the Autodesk Odrive project directory without syncing or downloading them.
+        Searches for all specified compressed files in the Autodesk Odrive project directory
+        without syncing or downloading them.
     
         :param project_name: The name of the project to search for compressed files.
+        :param file_types: List of file extensions to search for (e.g., ["zip", "rar", "7z"])
         :return: Dictionary containing file paths relative to the project directory or an error message.
         """
+        if file_types is None:
+            file_types = ["zip", "rar", "7z"]
+    
         home_dir = os.path.expanduser("~")
         base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
         project_path = os.path.join(base_path, "Square Engineering Firm", project_name, "Project Files")
@@ -439,33 +443,35 @@ class ACCAPI:
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
     
-        # Find all compressed files (including .cloud placeholders)
-        find_compressed_command = (
-                f'find "{project_path}" -type f '
-                f'\\( -iname "*.zip" -o -iname "*.zip.cloud" '
-                f'-o -iname "*.rar" -o -iname "*.rar.cloud" '
-                f'-o -iname "*.7z" -o -iname "*.7z.cloud" \\)'
-        )
-        # find_compressed_command = f'find "{project_path}" -type f \\( -iname "*.zip" -o -iname "*.zip.cloud" \\)'
-
+        # Construct find command dynamically based on provided file types
+        find_conditions = " -o ".join([f"-iname '*.{ext}' -o -iname '*.{ext}.cloud'" for ext in file_types])
+        find_compressed_command = f'find "{project_path}" -type f \( {find_conditions} \)'
+    
         result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
         compressed_files = result.stdout.strip().split("\n") if result.stdout else []
-        
+    
         if not compressed_files or compressed_files == ['']:
             return {"error": "No compressed files found in the project.", "status_code": 404}
-        
+    
         # Convert absolute paths to relative paths and replace .cloud extensions
-        relative_files = [
-                os.path.relpath(file, base_path).replace(".zip.cloud", ".zip")
-                .replace(".rar.cloud", ".rar")
-                .replace(".7z.cloud", ".7z")
-                for file in compressed_files
-        ]
-        
+        relative_files = []
+        file_counts = defaultdict(int)
+    
+        for file in compressed_files:
+            rel_path = os.path.relpath(file, base_path)
+            for ext in file_types:
+                if rel_path.endswith(f".{ext}.cloud"):
+                    rel_path = rel_path.replace(f".{ext}.cloud", f".{ext}")
+                if rel_path.endswith(f".{ext}"):
+                    file_counts[ext] += 1
+                    break
+            relative_files.append(rel_path)
+    
         return {
                 "message": "Compressed files found successfully.",
                 "files": relative_files,
                 "count": len(relative_files),
+                "file_counts": dict(file_counts),
                 "status_code": 200
         }
 
