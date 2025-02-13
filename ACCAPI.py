@@ -439,7 +439,7 @@ class ACCAPI:
     
         home_dir = os.path.expanduser("~")
         base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
-        project_path = os.path.join(base_path, "Square Engineering Firm", project_name, "Project Files")
+        project_path = os.path.join(base_path, "Square Engineering Firm", project_name)
     
         if not os.path.exists(project_path):
             return {"error": f"Project '{project_name}' not found.", "status_code": 404}
