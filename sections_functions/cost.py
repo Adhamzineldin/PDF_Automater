@@ -37,7 +37,8 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")
-
+    print("Change payment response:")
+    pretty_print_json(change_order_response)
     # Initialize variables
     current_date = datetime.now()
     
@@ -70,8 +71,7 @@ def print_cost_cover(project_id, url):
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
     print(change_orders)
     
-    print("Change payment response:")
-    pretty_print_json(change_order_response)
+    
     
     for payment in cost_payments:
         association_Id = payment["associationId"]
