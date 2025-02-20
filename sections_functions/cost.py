@@ -36,11 +36,7 @@ def print_cost_cover(project_id, url):
     acc_api = ACCAPI()
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
-    change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")
-
-    print("Change payment response:")
-    print(change_order_response)
-    change_order_response = change_order_response["results"]
+    change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
 
 
     # Initialize variables
