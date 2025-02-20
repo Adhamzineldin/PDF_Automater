@@ -102,31 +102,25 @@ def print_cost_cover(project_id, url):
             excel_modifier.open_workbook()
             print("Payment:")
             pretty_print_json(payment)
+            letter = "D"
             
             if new:
-                excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
-                excel_modifier.modify_cell("D13", new_item)
-                excel_modifier.modify_cell("D14", similar_item)
-                excel_modifier.modify_cell("D15", float(payment["amount"]))
+                letter = "D"
                 payment["status"] = "Main-Contractor"
             elif payment["status"] == "revise" or payment["status"] == "inReview":
-                excel_modifier.modify_cell("E10", float(payment["originalAmount"]))
-                excel_modifier.modify_cell("E13", new_item)
-                excel_modifier.modify_cell("E14", similar_item)
-                excel_modifier.modify_cell("E15", float(payment["amount"]))
+                letter = "E"
                 payment["status"] = "Consultant"
             elif payment["status"] == "accepted" or payment["status"] == "approved":
-                excel_modifier.modify_cell("F10", float(payment["originalAmount"]))
-                excel_modifier.modify_cell("F13", new_item)
-                excel_modifier.modify_cell("F14", similar_item)
-                excel_modifier.modify_cell("F15", float(payment["amount"]))
+                letter = "F"
                 payment["status"] = "Owner"
             else:
-                excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
-                excel_modifier.modify_cell("D13", new_item)
-                excel_modifier.modify_cell("D14", similar_item)
-                excel_modifier.modify_cell("D15", float(payment["amount"]))
+                letter = "D"
                 payment["status"] = "Main-Contractor"
+
+            excel_modifier.modify_cell(f"{letter}10", float(payment["originalAmount"]))
+            excel_modifier.modify_cell(f"{letter}13", new_item)
+            excel_modifier.modify_cell(f"{letter}14", similar_item)
+            excel_modifier.modify_cell(f"{letter}15", float(payment["amount"]))
             
             
 
