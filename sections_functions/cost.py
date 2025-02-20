@@ -70,6 +70,9 @@ def print_cost_cover(project_id, url):
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
     print(change_orders)
     
+    print("Change payment response:")
+    pretty_print_json(change_order_response)
+    
     for payment in cost_payments:
         association_Id = payment["associationId"]
         payment_number = payment["id"]
@@ -97,7 +100,9 @@ def print_cost_cover(project_id, url):
         excel_modifier = ExcelModifier(template_filename=selected_template, modified_folder="modified_files")
         try:
             excel_modifier.open_workbook()
+            print("Payment:")
             pretty_print_json(payment)
+            
             if new:
                 excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
                 excel_modifier.modify_cell("D13", new_item)
