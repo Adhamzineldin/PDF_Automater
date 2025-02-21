@@ -252,7 +252,7 @@ class ExcelModifier:
                 
                 
             
-                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
+                # acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
                 
                 
                 
