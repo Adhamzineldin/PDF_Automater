@@ -37,8 +37,8 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
-    sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")
-    print(f"sov response is {sov_response}")
+    sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
+    pretty_print_json(sov_response)
 
     # Initialize variables
     current_date = datetime.now()
