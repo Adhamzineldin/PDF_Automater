@@ -36,7 +36,7 @@ def extract_cost_id(url):
 def modify_cell_with_null_check(excel_modifier, letter, cell, value):
     print(f"typeof value is {type(value)}")
     if value:
-        excel_modifier.modify_cell(f"{letter}{cell}", float(value))
+        excel_modifier.modify_cell(f"{letter}{cell}", value)
     else:
         value = 0  # Set empty string if None
 
