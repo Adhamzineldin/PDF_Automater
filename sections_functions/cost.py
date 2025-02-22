@@ -37,7 +37,8 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
-
+    sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")
+    print(f"sov response is {sov_response}")
 
     # Initialize variables
     current_date = datetime.now()
@@ -70,6 +71,9 @@ def print_cost_cover(project_id, url):
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
     print(change_orders)
+    
+    
+    
     
     
     
@@ -118,9 +122,10 @@ def print_cost_cover(project_id, url):
                 payment["status"] = "Main-Contractor"
 
             excel_modifier.modify_cell(f"{letter}10", float(payment["originalAmount"]))
+            excel_modifier.modify_cell(f"{letter}20", float(payment["amount"]))
             excel_modifier.modify_cell(f"{letter}13", new_item)
             excel_modifier.modify_cell(f"{letter}14", similar_item)
-            excel_modifier.modify_cell(f"{letter}15", float(payment["amount"]))
+            
             
             
 
