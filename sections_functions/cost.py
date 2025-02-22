@@ -119,10 +119,12 @@ def print_cost_cover(project_id, url):
 
 
         sovs = [sov for sov in sov_response if sov["contractId"] == association_Id]
+        
         project_mobilization = [sov for sov in sovs if sov["code"] == "CP01-GNR-Al"]
         if project_mobilization:
             project_mobilization = project_mobilization[0]
-
+        else:
+            project_mobilization = {"amount": 0}
         excel_modifier = ExcelModifier(template_filename=selected_template, modified_folder="modified_files")
         try:
             excel_modifier.open_workbook()
