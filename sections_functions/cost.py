@@ -135,7 +135,7 @@ def print_cost_cover(project_id, url):
             excel_modifier.modify_cell(f"{letter}14", similar_item)
 
 
-            materials
+            
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
             project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
