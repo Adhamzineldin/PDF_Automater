@@ -32,6 +32,20 @@ def extract_cost_id(url):
     return None
 
 
+
+def modify_cell_with_null_check(excel_modifier, letter, cell, value):
+    if value is not None:
+        try:
+            value = float(value) if isinstance(value, (int, float, str)) and str(value).strip() else None
+        except ValueError:
+            value = 0
+    else:
+        value = 0  # Set empty string if None
+
+    excel_modifier.modify_cell(f"{letter}{cell}", value)
+
+
+
 def print_cost_cover(project_id, url):
     acc_api = ACCAPI()
 
@@ -105,7 +119,9 @@ def print_cost_cover(project_id, url):
 
 
         sovs = [sov for sov in sov_response if sov["contractId"] == association_Id]
-        project_mobilization = [sov for sov in sovs if sov["code"] == "CP01-GNR-Al"][0]
+        project_mobilization = [sov for sov in sovs if sov["code"] == "CP01-GNR-Al"]
+        if project_mobilization:
+            project_mobilization = project_mobilization[0]
 
         excel_modifier = ExcelModifier(template_filename=selected_template, modified_folder="modified_files")
         try:
@@ -127,14 +143,12 @@ def print_cost_cover(project_id, url):
                 letter = "D"
                 payment["status"] = "Main-Contractor"
 
-            excel_modifier.modify_cell(f"{letter}10", float(payment["originalAmount"]))
-            excel_modifier.modify_cell(f"{letter}20", float(payment["amount"]))
-            excel_modifier.modify_cell(f"{letter}23", float(project_mobilization["amount"]))
-            excel_modifier.modify_cell(f"{letter}26", float(payment["materials"]))
-            excel_modifier.modify_cell(f"{letter}13", new_item)
-            excel_modifier.modify_cell(f"{letter}14", similar_item)
-
-
+            modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
+            modify_cell_with_null_check(excel_modifier, letter, "20", payment.get("amount"))
+            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization.get("amount"))
+            modify_cell_with_null_check(excel_modifier, letter, "26", payment.get("materials"))
+            modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
+            modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
