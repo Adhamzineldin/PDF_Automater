@@ -143,12 +143,14 @@ def print_cost_cover(project_id, url):
                 letter = "D"
                 payment["status"] = "Main-Contractor"
 
-            modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
-            modify_cell_with_null_check(excel_modifier, letter, "20", payment.get("amount"))
-            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization.get("amount"))
-            modify_cell_with_null_check(excel_modifier, letter, "26", payment.get("materials"))
+            modify_cell_with_null_check(excel_modifier, letter, "10", float(payment["originalAmount"]))
+            modify_cell_with_null_check(excel_modifier, letter, "20", float(payment["amount"]))
+            modify_cell_with_null_check(excel_modifier, letter, "23", float(project_mobilization["amount"]))
+            modify_cell_with_null_check(excel_modifier, letter, "26", float(payment["materials"]))
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
+
+
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
