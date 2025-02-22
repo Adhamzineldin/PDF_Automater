@@ -77,6 +77,8 @@ def print_cost_cover(project_id, url):
     
     
     
+    
+    
     for payment in cost_payments:
         association_Id = payment["associationId"]
         payment_number = payment["id"]
@@ -101,6 +103,10 @@ def print_cost_cover(project_id, url):
         else:
             selected_template = "templates/cost_cover_template.xlsx"
 
+
+        sovs = [sov for sov in sov_response if sov["contractId"] == association_Id]
+        project_mobilization = [sov for sov in sovs if sov["code"] == "CP01-GNR-Al"][0]
+
         excel_modifier = ExcelModifier(template_filename=selected_template, modified_folder="modified_files")
         try:
             excel_modifier.open_workbook()
@@ -123,11 +129,13 @@ def print_cost_cover(project_id, url):
 
             excel_modifier.modify_cell(f"{letter}10", float(payment["originalAmount"]))
             excel_modifier.modify_cell(f"{letter}20", float(payment["amount"]))
+            excel_modifier.modify_cell(f"{letter}23", float(project_mobilization["amount"]))
+            excel_modifier.modify_cell(f"{letter}26", float(payment["materials"]))
             excel_modifier.modify_cell(f"{letter}13", new_item)
             excel_modifier.modify_cell(f"{letter}14", similar_item)
-            
-            
-            
+
+
+            materials
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
             project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
