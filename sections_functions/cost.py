@@ -38,9 +38,9 @@ def modify_cell_with_null_check(excel_modifier, letter, cell, value):
     if value:
         excel_modifier.modify_cell(f"{letter}{cell}", value)
     else:
-        value = 0  # Set empty string if None
+        excel_modifier.modify_cell(f"{letter}{cell}", 0)
 
-    excel_modifier.modify_cell(f"{letter}{cell}", value)
+    
 
 
 
