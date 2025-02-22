@@ -35,10 +35,7 @@ def extract_cost_id(url):
 
 def modify_cell_with_null_check(excel_modifier, letter, cell, value):
     if value is not None:
-        try:
-            value = float(value) if isinstance(value, (int, float, str)) and str(value).strip() else None
-        except ValueError:
-            value = 0
+        excel_modifier.modify_cell(f"{letter}{cell}", float(value))
     else:
         value = 0  # Set empty string if None
 
