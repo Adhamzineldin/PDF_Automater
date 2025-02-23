@@ -154,7 +154,11 @@ def print_cost_cover(project_id, url):
             
 
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
-            project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
+            try:
+                project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
+            except Exception:
+                project = {"name": "Information Systems Workspace "}
+                print("Failed to fetch project name PROP PERMISSION ISSUE")
             pdf_path = excel_modifier.export_to_pdf(payment, filename='output.pdf', excel_filename=payment_number, project_name=project["name"])
 
             # Return the generated PDF path
