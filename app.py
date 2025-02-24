@@ -143,8 +143,13 @@ def generate_pdf():
     response = response_queue.get()
 
     # Send the PDF file if processing is successful
+    print("Response: ", response)
     if "pdf_path" in response:
         pdf_path = response["pdf_path"]
+        if not pdf_path.endswith(".pdf"):
+            pdf_path += ".pdf"
+        pdf_path = os.path.normpath(pdf_path)
+
         if os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name="output.pdf", mimetype="application/pdf")
         else:

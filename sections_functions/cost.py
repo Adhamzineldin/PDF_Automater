@@ -50,7 +50,7 @@ def print_cost_cover(project_id, url):
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
-    pretty_print_json(sov_response)
+    # pretty_print_json(sov_response)
 
     # Initialize variables
     current_date = datetime.now()
@@ -145,23 +145,20 @@ def print_cost_cover(project_id, url):
 
 
             print("--------------------------------TEST----------------------------------------------")
-            test = acc_api.call_api(f"cost/v1/containers/{project_id}/main-contracts/f617c3c0-f1b2-11ef-a0c5-e95784cac2e3/items")["results"]
-            pretty_print_json(test)
-
-           
-           
-            
+            payment_items = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")["results"]
+            project_mobilization = [item for item in payment_items if item["number"] in ["01-71", "01-72"]]
+            project_mobilization = sum([float(item["amount"]) for item in project_mobilization])
     
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
             modify_cell_with_null_check(excel_modifier, letter, "20", payment["amount"])
-            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization["amount"])
+            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization)
             modify_cell_with_null_check(excel_modifier, letter, "26", payment["materials"])
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
 
 
             
-
+            print(f"Payment Number: {payment_number}")
             excel_modifier.save_workbook(filename=f'{payment_number}.xlsx')
             try:
                 project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
@@ -174,6 +171,7 @@ def print_cost_cover(project_id, url):
             else:
                 print("Failed to upload PDF to ACC Because no project name")
             
+            print(f"FINAL PDF PATH: {pdf_path}")
             return pdf_path
         except Exception as e:
             print(f"Failed to modify Excel file: {str(e)}")
