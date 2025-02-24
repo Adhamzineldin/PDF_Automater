@@ -118,7 +118,7 @@ def print_cost_cover(project_id, url):
 
         sovs = [sov for sov in sov_response if sov["contractId"] == association_Id]
         
-        project_mobilization = [sov for sov in sovs if sov["code"] == "CP01-GNR-Al"]
+        project_mobilization = [sov for sov in sovs if sov["name"] == "Project Mobilization"]
         if project_mobilization:
             project_mobilization = project_mobilization[0]
         else:
