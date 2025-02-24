@@ -144,9 +144,12 @@ def print_cost_cover(project_id, url):
                 payment["status"] = "Main-Contractor"
 
 
-
-            test = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values/{project_mobilization['id']}")
+            print("--------------------------------TEST----------------------------------------------")
+            test = acc_api.call_api(f"cost/v1/CONTAINERS/{project_id}/payments/{payment_number}")
             pretty_print_json(test)
+            test2 = acc_api.call_api(f"cost/v1/CONTAINERS/{project_id}/payments/{payment_number}/items")
+            pretty_print_json(test)
+            
     
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
             modify_cell_with_null_check(excel_modifier, letter, "20", payment["amount"])
