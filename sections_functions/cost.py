@@ -146,7 +146,7 @@ def print_cost_cover(project_id, url):
 
             print("--------------------------------TEST----------------------------------------------")
             test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")
-            pretty_print_json(test)
+            # pretty_print_json(test)
             
             
     
