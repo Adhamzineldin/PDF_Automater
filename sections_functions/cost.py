@@ -50,7 +50,7 @@ def print_cost_cover(project_id, url):
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
-    pretty_print_json(sov_response)
+    pretty_print_json(change_order_response)
 
     # Initialize variables
     current_date = datetime.now()
@@ -145,14 +145,10 @@ def print_cost_cover(project_id, url):
 
 
             print("--------------------------------TEST----------------------------------------------")
-            test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")["results"]
+            #test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")["results"]
 
-            search_terms = ["2f4e1c63-7982-4923-87f1-d506db23011e", "Project Mobilization"]
-            test = [item for item in test if any(
-                    str(value) in search_terms for value in item.values()
-            )]
-
-            pretty_print_json(test)
+           
+           
             
     
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
