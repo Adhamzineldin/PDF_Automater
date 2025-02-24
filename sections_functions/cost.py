@@ -50,7 +50,9 @@ def print_cost_cover(project_id, url):
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
-    pretty_print_json(sov_response)
+    budgets = acc_api.call_api(f"cost/v1/containers/{project_id}/budgets")["results"]
+    pretty_print_json(budgets)
+    
 
     # Initialize variables
     current_date = datetime.now()
@@ -82,7 +84,7 @@ def print_cost_cover(project_id, url):
     print(f"cost id is {cost_id}")
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
-    print(change_orders)
+
     
     
     
@@ -126,8 +128,8 @@ def print_cost_cover(project_id, url):
         excel_modifier = ExcelModifier(template_filename=selected_template, modified_folder="modified_files")
         try:
             excel_modifier.open_workbook()
-            print("Payment:")
-            pretty_print_json(payment)
+
+          
             letter = "D"
             
             if new:
