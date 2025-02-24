@@ -157,11 +157,14 @@ def print_cost_cover(project_id, url):
             try:
                 project = acc_api.call_api(f"construction/admin/v1/projects/{project_id}")
             except Exception:
-                project = {"name": "Information Systems Workspace "}
+                project =  None
                 print("Failed to fetch project name PROP PERMISSION ISSUE")
-            pdf_path = excel_modifier.export_to_pdf(payment, filename='output.pdf', excel_filename=payment_number, project_name=project["name"])
-
-            # Return the generated PDF path
+            pdf_path = excel_modifier.export_to_pdf(payment, filename='output.pdf', excel_filename=payment_number)
+            if project:
+                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename='output.pdf', project_name=project["name"], folder_name="Cost Cover Sheets")
+            else:
+                print("Failed to upload PDF to ACC Because no project name")
+            
             return pdf_path
         except Exception as e:
             print(f"Failed to modify Excel file: {str(e)}")

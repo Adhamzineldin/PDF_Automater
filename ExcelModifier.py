@@ -248,11 +248,11 @@ class ExcelModifier:
                 print(f"PDF exported at {pdf_path}")
 
 
-                acc_api = ACCAPI()
+                # acc_api = ACCAPI()
+                # 
+                # acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
                 
-                
-            
-                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
+                return pdf_path
                 
                 
                 
