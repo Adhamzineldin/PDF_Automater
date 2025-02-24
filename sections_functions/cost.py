@@ -146,8 +146,8 @@ def print_cost_cover(project_id, url):
 
             print("--------------------------------TEST----------------------------------------------")
             test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")["results"]
-            test = [item for item in test if item["paymentId"] == payment_number]
-            pretty_print_json(test)
+            # test = [item for item in test if item["paymentId"] == payment_number]
+            # pretty_print_json(test)
             
     
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
