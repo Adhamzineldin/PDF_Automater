@@ -145,7 +145,7 @@ def print_cost_cover(project_id, url):
 
 
             print("--------------------------------TEST----------------------------------------------")
-            test = acc_api.call_api(f"	v1/containers/{project_id}/main-contracts/f617c3c0-f1b2-11ef-a0c5-e95784cac2e3/items")["results"]
+            test = acc_api.call_api(f"cost/v1/containers/{project_id}/main-contracts/f617c3c0-f1b2-11ef-a0c5-e95784cac2e3/items")["results"]
             pretty_print_json(test)
 
            
