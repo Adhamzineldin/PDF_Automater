@@ -4,6 +4,8 @@ import re
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
+from xlwings.mac_dict import properties
+
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
 
@@ -148,13 +150,31 @@ def print_cost_cover(project_id, url):
             payment_items = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items?filter[paymentId]={payment_number}")["results"]
             project_mobilization = [item for item in payment_items if item["number"] in ["01-71", "01-72"]]
             project_mobilization = sum([float(item["amount"]) for item in project_mobilization])
+            
+            properties = payment["properties"]
+
+            property_000 = [propertie for propertie in properties if propertie["name"].includes("000")]
+            property_001 = [propertie for propertie in properties if propertie["name"].includes("001")]
+            property_002 = [propertie for propertie in properties if propertie["name"].includes("002")]
+            property_003 = [propertie for propertie in properties if propertie["name"].includes("003")]
+            property_004 = [propertie for propertie in properties if propertie["name"].includes("004")]
+            property_005 = [propertie for propertie in properties if propertie["name"].includes("005")]
+            
     
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
+            modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
+            modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
             modify_cell_with_null_check(excel_modifier, letter, "20", payment["amount"])
             modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization)
             modify_cell_with_null_check(excel_modifier, letter, "26", payment["materials"])
-            modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
-            modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
+            modify_cell_with_null_check(excel_modifier, letter, "35", property_000)
+            modify_cell_with_null_check(excel_modifier, letter, "36", property_001)
+            modify_cell_with_null_check(excel_modifier, letter, "37", property_002)
+            modify_cell_with_null_check(excel_modifier, letter, "38", property_003)
+            modify_cell_with_null_check(excel_modifier, letter, "39", property_004)
+            modify_cell_with_null_check(excel_modifier, letter, "40", property_005)
+            
+            
 
 
             
