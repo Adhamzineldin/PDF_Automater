@@ -163,10 +163,11 @@ def print_cost_cover(project_id, url):
 
 
 
-            current_date = datetime.now().strftime("%m/%d/%y")
             today = datetime.now()
+            month_name = today.strftime("%B")  
             last_day = calendar.monthrange(today.year, today.month)[1]
-            last_date = f"{today.month:02}/{last_day:02}/{str(today.year)[-2:]}" 
+            
+            last_date = f"{last_day} {month_name} {today.year}"
             
 
             excel_modifier.modify_cell("C7", current_date)
