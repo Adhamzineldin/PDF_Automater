@@ -111,8 +111,8 @@ def print_cost_cover(project_id, url):
         inflation_rate = sum([item["estimated"] for item in items if item["type"] == "INF" and "estimated" in item and item["estimated"] is not None])
         remeasured = sum([item["estimated"] for item in items if item["type"] == "REM" and "estimated" in item and item["estimated"] is not None])
         
-        print(f"inflation rate is {inflation_rate}")
-        print(f"remeasured is {remeasured}")
+        print([item["estimated"] for item in items if item["type"] == "INF" and "estimated" in item and item["estimated"] is not None])
+        print([item["estimated"] for item in items if item["type"] == "REM" and "estimated" in item and item["estimated"] is not None])
 
 
         # Determine the template path based on association ID
