@@ -159,21 +159,22 @@ def print_cost_cover(project_id, url):
             property_003 = next(iter([p for p in properties if "003" in p["name"]]), None)
             property_004 = next(iter([p for p in properties if "004" in p["name"]]), None)
             property_005 = next(iter([p for p in properties if "005" in p["name"]]), None)
-
-
-
+            
+            
+            
+            
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
             modify_cell_with_null_check(excel_modifier, letter, "20", payment["amount"])
             modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization)
             modify_cell_with_null_check(excel_modifier, letter, "26", payment["materials"])
-            modify_cell_with_null_check(excel_modifier, letter, "35", property_000)
-            modify_cell_with_null_check(excel_modifier, letter, "36", property_001)
-            modify_cell_with_null_check(excel_modifier, letter, "37", property_002)
-            modify_cell_with_null_check(excel_modifier, letter, "38", property_003)
-            modify_cell_with_null_check(excel_modifier, letter, "39", property_004)
-            modify_cell_with_null_check(excel_modifier, letter, "40", property_005)
+            modify_cell_with_null_check(excel_modifier, letter, "35", property_000["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "36", property_001["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "37", property_002["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "38", property_003["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "39", property_004["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "40", property_005["value"])
             
             
 
