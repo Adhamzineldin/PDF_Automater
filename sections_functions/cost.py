@@ -153,12 +153,12 @@ def print_cost_cover(project_id, url):
             
             properties = payment["properties"]
 
-            property_000 = [custom_property for custom_property in properties if "000" in custom_property["name"]]
-            property_001 = [custom_property for custom_property in properties if "001" in custom_property["name"]]
-            property_002 = [custom_property for custom_property in properties if "002" in custom_property["name"]]
-            property_003 = [custom_property for custom_property in properties if "003" in custom_property["name"]]
-            property_004 = [custom_property for custom_property in properties if "004" in custom_property["name"]]
-            property_005 = [custom_property for custom_property in properties if "005" in custom_property["name"]]
+            property_000 = next(iter([p for p in properties if "000" in p["name"]]), None)
+            property_001 = next(iter([p for p in properties if "001" in p["name"]]), None)
+            property_002 = next(iter([p for p in properties if "002" in p["name"]]), None)
+            property_003 = next(iter([p for p in properties if "003" in p["name"]]), None)
+            property_004 = next(iter([p for p in properties if "004" in p["name"]]), None)
+            property_005 = next(iter([p for p in properties if "005" in p["name"]]), None)
 
 
 
