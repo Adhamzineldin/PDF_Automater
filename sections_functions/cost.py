@@ -153,14 +153,15 @@ def print_cost_cover(project_id, url):
             
             properties = payment["properties"]
 
-            property_000 = [propertie for propertie in properties if propertie["name"].includes("000")]
-            property_001 = [propertie for propertie in properties if propertie["name"].includes("001")]
-            property_002 = [propertie for propertie in properties if propertie["name"].includes("002")]
-            property_003 = [propertie for propertie in properties if propertie["name"].includes("003")]
-            property_004 = [propertie for propertie in properties if propertie["name"].includes("004")]
-            property_005 = [propertie for propertie in properties if propertie["name"].includes("005")]
-            
-    
+            property_000 = [custom_property for custom_property in properties if "000" in custom_property["name"]]
+            property_001 = [custom_property for custom_property in properties if "001" in custom_property["name"]]
+            property_002 = [custom_property for custom_property in properties if "002" in custom_property["name"]]
+            property_003 = [custom_property for custom_property in properties if "003" in custom_property["name"]]
+            property_004 = [custom_property for custom_property in properties if "004" in custom_property["name"]]
+            property_005 = [custom_property for custom_property in properties if "005" in custom_property["name"]]
+
+
+
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
