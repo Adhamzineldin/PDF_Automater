@@ -85,7 +85,7 @@ def print_cost_cover(project_id, url):
     print(f"cost id is {cost_id}")
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
-    pretty_print_json(change_orders)
+ 
     
     
     
@@ -110,7 +110,9 @@ def print_cost_cover(project_id, url):
 
         inflation_rate = sum([item["estimated"] for item in items if item["type"] == "INF" and "estimated" in item and item["estimated"] is not None])
         remeasured = sum([item["estimated"] for item in items if item["type"] == "REM" and "estimated" in item and item["estimated"] is not None])
-
+        
+        print(f"inflation rate is {inflation_rate}")
+        print(f"remeasured is {remeasured}")
 
 
         # Determine the template path based on association ID
