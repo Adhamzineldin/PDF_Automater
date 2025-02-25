@@ -213,6 +213,8 @@ class ExcelModifier:
             sheet_api.PageSetup.Zoom = False         # Disable zoom
             try:
                 sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
+                pdf_path = pdf_path + ".pdf"  # xlwings doesn't add the extension
+                
                 print(f"PDF exported at {pdf_path}")
             except Exception as e:
                 print(f"Error exporting to PDF: {e}")
