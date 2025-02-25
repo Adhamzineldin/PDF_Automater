@@ -174,6 +174,7 @@ def print_cost_cover(project_id, url):
             if len(payment["recipients"]) > 1:
                 reviewer = acc_api.call_api(f"construction/admin/v1/projects/{project_id}/users/{payment["recipients"][0]['id']}")
                 excel_modifier.modify_cell("D52", reviewer["name"])
+                print(f"Reviewer: {reviewer['name']}")
             
 
             excel_modifier.modify_cell("C7", current_date)
