@@ -169,6 +169,11 @@ def print_cost_cover(project_id, url):
             
             last_date = f"{last_day} {month_name} {today.year}"
             
+            
+            
+            test = acc_api.call_api(f"construction/admin/v1/projects/{project_id}/users/{payment["recipients"][0]['id']}")
+            pretty_print_json(test)
+            
 
             excel_modifier.modify_cell("C7", current_date)
             excel_modifier.modify_cell("F6", last_date)
