@@ -1,3 +1,4 @@
+import calendar
 import json
 import os
 import re
@@ -106,6 +107,10 @@ def print_cost_cover(project_id, url):
             else:
                 if item["estimated"]:
                     new_item += float(item["estimated"])
+                    
+        inflation_rate = sum([item for item in items if item["type"] == "INF"])
+        remeasured = sum([item for item in items if item["type"] == "REM"])
+        
 
         # Determine the template path based on association ID
         template_filename = f"{payment_number}.xlsx"
@@ -159,22 +164,32 @@ def print_cost_cover(project_id, url):
             property_003 = next(iter([p for p in properties if "003" in p["name"]]), None)
             property_004 = next(iter([p for p in properties if "004" in p["name"]]), None)
             property_005 = next(iter([p for p in properties if "005" in p["name"]]), None)
+
+
+
+            current_date = datetime.now().strftime("%d/%m/%y")
+            today = datetime.now()
+            last_day = calendar.monthrange(today.year, today.month)[1]
+            last_date = f"{last_day:02}/{today.month:02}/{str(today.year)[-2:]}" 
             
-            
-            
-            
+
+            excel_modifier.modify_cell("C7", current_date)
+            excel_modifier.modify_cell("F6", last_date)
             modify_cell_with_null_check(excel_modifier, letter, "10", payment["originalAmount"])
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
+            modify_cell_with_null_check(excel_modifier, letter, "15", remeasured)
+            modify_cell_with_null_check(excel_modifier, letter, "16", inflation_rate)
             modify_cell_with_null_check(excel_modifier, letter, "20", payment["amount"])
-            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization)
-            modify_cell_with_null_check(excel_modifier, letter, "26", payment["materials"])
-            modify_cell_with_null_check(excel_modifier, letter, "35", property_000["value"])
-            modify_cell_with_null_check(excel_modifier, letter, "36", property_001["value"])
-            modify_cell_with_null_check(excel_modifier, letter, "37", property_002["value"])
-            modify_cell_with_null_check(excel_modifier, letter, "38", property_003["value"])
-            modify_cell_with_null_check(excel_modifier, letter, "39", property_004["value"])
-            modify_cell_with_null_check(excel_modifier, letter, "40", property_005["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "23", property_004["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "24", property_005["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "25", project_mobilization)
+            modify_cell_with_null_check(excel_modifier, letter, "28", payment["materials"])
+            modify_cell_with_null_check(excel_modifier, letter, "37", property_000["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "38", property_001["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "39", property_002["value"])
+            modify_cell_with_null_check(excel_modifier, letter, "40", property_003["value"])
+           
             
             
 
