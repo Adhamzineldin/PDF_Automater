@@ -164,11 +164,12 @@ def print_cost_cover(project_id, url):
 
 
 
-            today = datetime.now()
-            month_name = today.strftime("%B")  
-            last_day = calendar.monthrange(today.year, today.month)[1]
+            start_date_obj = datetime.strptime(payment["startDate"], "%Y-%m-%d")
+            end_date_obj = datetime.strptime(payment["endDate"], "%Y-%m-%d")
             
-            last_date = f"{last_day} {month_name} {today.year}"
+            # Format both dates
+            first_date = start_date_obj.strftime("%d %B %Y")  # Example: "01 March 2025"
+            last_date = end_date_obj.strftime("%d %B %Y")
             
             
             
@@ -185,7 +186,7 @@ def print_cost_cover(project_id, url):
             subtitle = f"مستخلص جاري رقم ({payment_gary_number}) "
             excel_modifier.modify_cell("D2", title)
             excel_modifier.modify_cell("E4", subtitle)
-            excel_modifier.modify_cell("C7", current_date)
+            excel_modifier.modify_cell("C7", first_date)
             excel_modifier.modify_cell("F6", last_date)
             excel_modifier.modify_cell("C44", payment_gary_number )
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
