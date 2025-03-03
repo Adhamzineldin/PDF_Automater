@@ -57,26 +57,33 @@ class ExcelModifier:
         else:
             # For openpyxl, handle merged cells properly
             cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
-    
+        
+            # Store the original number format to preserve formatting (e.g., date format)
+            original_format = cell.number_format
+        
             # Check if the cell is part of a merged range using openpyxl's merged_cells method
             is_merged = False
             cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')
-    
+        
             for merged_range in self.sheet.merged_cells.ranges:
                 if cell_coord in merged_range:
                     is_merged = True
                     break
-    
+        
             if is_merged:
                 # If the cell is merged, modify the top-left cell of the merged range
                 for merged_range in self.sheet.merged_cells.ranges:
                     if cell_coord in merged_range:
                         top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
+                        original_format = top_left_cell.number_format  # Preserve original format
                         top_left_cell.value = value
+                        top_left_cell.number_format = original_format  # Restore format
                         break
             else:
                 # Modify the original cell if it's not part of a merged range
                 cell.value = value
+                cell.number_format = original_format  # Restore format
+                
         print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
