@@ -178,8 +178,11 @@ def print_cost_cover(project_id, url):
                 excel_modifier.modify_cell("D52", reviewer["name"])
                 pretty_print_json(reviewer)
                 print(f"Reviewer: {reviewer['name']}")
-            
 
+            test = f"""عقد تنفيذ فيلات منطقة V35 - مدينتي
+    عن أعمال حتى {last_date}"""
+            
+            excel_modifier.modify_cell("D2", test)
             excel_modifier.modify_cell("C7", current_date)
             excel_modifier.modify_cell("F6", last_date)
             # excel_modifier.modify_cell("C44", f"جاري رقم ( {payment["number"][-1:]} )")
