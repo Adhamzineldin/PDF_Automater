@@ -58,31 +58,40 @@ class ExcelModifier:
             # For openpyxl, handle merged cells properly
             cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
         
-            # Store the original number format to preserve formatting (e.g., date format)
+            # Preserve the original formula, format, and value display behavior
+            original_formula = cell.formula if hasattr(cell, "formula") else None  # Check if cell has a formula
             original_format = cell.number_format
+            original_style = cell.style  # Preserve style (e.g., alignment, font, borders)
         
-            # Check if the cell is part of a merged range using openpyxl's merged_cells method
-            is_merged = False
-            cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')
-        
-            for merged_range in self.sheet.merged_cells.ranges:
-                if cell_coord in merged_range:
-                    is_merged = True
-                    break
+            # Check if the cell is part of a merged range
+            is_merged = any(cell.coordinate in merged_range for merged_range in self.sheet.merged_cells.ranges)
         
             if is_merged:
-                # If the cell is merged, modify the top-left cell of the merged range
                 for merged_range in self.sheet.merged_cells.ranges:
-                    if cell_coord in merged_range:
+                    if cell.coordinate in merged_range:
                         top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
-                        original_format = top_left_cell.number_format  # Preserve original format
+        
+                        # Preserve merged cell format and style
+                        original_format = top_left_cell.number_format
+                        original_style = top_left_cell.style
+                        original_formula = top_left_cell.formula if hasattr(top_left_cell, "formula") else None
+        
+                        # Update value
                         top_left_cell.value = value
-                        top_left_cell.number_format = original_format  # Restore format
+        
+                        # Restore format and style
+                        top_left_cell.number_format = original_format
+                        top_left_cell.style = original_style
+                        if original_formula:
+                            top_left_cell.formula = original_formula
                         break
             else:
                 # Modify the original cell if it's not part of a merged range
                 cell.value = value
-                cell.number_format = original_format  # Restore format
+                cell.number_format = original_format
+                cell.style = original_style
+                if original_formula:
+                    cell.formula = original_formula
                 
         print(f"Cell {cell_range} updated to {value}.")
 
