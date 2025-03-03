@@ -182,7 +182,7 @@ def print_cost_cover(project_id, url):
 
             excel_modifier.modify_cell("C7", current_date)
             excel_modifier.modify_cell("F6", last_date)
-            excel_modifier.modify_cell("C44", payment["number"][-1:-2])
+            excel_modifier.modify_cell("C44", f"جاري رقم ( { payment["number"][-1:-2]} )")
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
