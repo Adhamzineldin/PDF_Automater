@@ -179,14 +179,14 @@ def print_cost_cover(project_id, url):
                 pretty_print_json(reviewer)
                 print(f"Reviewer: {reviewer['name']}")
 
-            test = f"""عقد تنفيذ فيلات منطقة V35 - مدينتي
-    عن أعمال حتى {last_date}"""
-            
-            excel_modifier.modify_cell("D2", test)
+            title = f"""عقد تنفيذ فيلات منطقة V35 - مدينتي
+    عن أعمال حتى {last_date}"""  
+            payment_gary_number = int(payment["number"][-1:])
+            subtitle = f"مستخلص جاري رقم ({payment_gary_number}) "
+            excel_modifier.modify_cell("D2", title)
             excel_modifier.modify_cell("C7", current_date)
             excel_modifier.modify_cell("F6", last_date)
-            # excel_modifier.modify_cell("C44", f"جاري رقم ( {payment["number"][-1:]} )")
-            excel_modifier.modify_cell("C44", int(payment["number"][-1:]))
+            excel_modifier.modify_cell("C44", payment_gary_number )
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
