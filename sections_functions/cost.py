@@ -160,6 +160,7 @@ def print_cost_cover(project_id, url):
             property_003 = next(iter([p for p in properties if "003" in p["name"]]), {})
             property_004 = next(iter([p for p in properties if "004" in p["name"]]), {})
             property_005 = next(iter([p for p in properties if "005" in p["name"]]), {})
+            property_006 = next(iter([p for p in properties if "006" in p["name"]]), {})
 
 
 
@@ -181,20 +182,20 @@ def print_cost_cover(project_id, url):
 
             excel_modifier.modify_cell("C7", current_date)
             excel_modifier.modify_cell("F6", last_date)
+            excel_modifier.modify_cell("C44", payment["number"][-1:-2])
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
             modify_cell_with_null_check(excel_modifier, letter, "14", similar_item)
             modify_cell_with_null_check(excel_modifier, letter, "15", remeasured)
             modify_cell_with_null_check(excel_modifier, letter, "16", inflation_rate)
             modify_cell_with_null_check(excel_modifier, letter, "20", payment.get("amount"))
-            modify_cell_with_null_check(excel_modifier, letter, "23", property_004.get("value"))
-            modify_cell_with_null_check(excel_modifier, letter, "24", property_005.get("value"))
-            modify_cell_with_null_check(excel_modifier, letter, "25", project_mobilization)
-            modify_cell_with_null_check(excel_modifier, letter, "28", payment.get("materials"))
-            modify_cell_with_null_check(excel_modifier, letter, "37", property_000.get("value"))
-            modify_cell_with_null_check(excel_modifier, letter, "38", property_001.get("value"))
-            modify_cell_with_null_check(excel_modifier, letter, "39", property_002.get("value"))
-            modify_cell_with_null_check(excel_modifier, letter, "40", property_003.get("value"))
+            modify_cell_with_null_check(excel_modifier, letter, "23", project_mobilization)
+            modify_cell_with_null_check(excel_modifier, letter, "26", payment.get("materials"))
+            modify_cell_with_null_check(excel_modifier, letter, "35", property_000.get("value"))
+            modify_cell_with_null_check(excel_modifier, letter, "36", property_001.get("value"))
+            modify_cell_with_null_check(excel_modifier, letter, "37", property_002.get("value"))
+            modify_cell_with_null_check(excel_modifier, letter, "38", property_003.get("value"))
+            modify_cell_with_null_check(excel_modifier, letter, "45", property_006.get("value"))
            
             
             
