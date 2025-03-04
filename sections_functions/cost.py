@@ -1,12 +1,9 @@
-import calendar
+
 import json
-import locale
 import os
 import re
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
-
-from xlwings.mac_dict import properties
 
 from ACCAPI import ACCAPI
 from ExcelModifier import ExcelModifier
@@ -169,13 +166,23 @@ def print_cost_cover(project_id, url):
             end_date_obj = datetime.strptime(payment["endDate"], "%Y-%m-%d")
             
             # Format both dates
-            # first_date = start_date_obj.strftime("%d %B %Y")  # Example: "01 March 2025"
-            # last_date = end_date_obj.strftime("%d %B %Y")
+            arabic_months = {
+                    "January": "يناير", "February": "فبراير", "March": "مارس",
+                    "April": "أبريل", "May": "مايو", "June": "يونيو",
+                    "July": "يوليو", "August": "أغسطس", "September": "سبتمبر",
+                    "October": "أكتوبر", "November": "نوفمبر", "December": "ديسمبر"
+            }
 
-            locale.setlocale(locale.LC_TIME, "ar_EG.utf8")
-            
-            first_date = start_date_obj.strftime("%d %B %Y")  
+            # Format the date and translate the month
+            first_date = start_date_obj.strftime("%d %B %Y")  # This already puts day before month
             last_date = end_date_obj.strftime("%d %B %Y")
+            
+            # Replace English month names with Arabic
+            for eng, arab in arabic_months.items():
+                first_date = first_date.replace(eng, arab)
+                last_date = last_date.replace(eng, arab)
+
+            
             
             
             
