@@ -48,20 +48,20 @@ class ExcelModifier:
         print(f"Workbook opened using {self.backend}.")
 
     def modify_cell(self, cell_range, value):
-        """Modifies a specific cell range with a new value and sets the font to Times New Roman."""
+        """Modifies a specific cell range with a new value."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
-    
         if self.backend == 'xlwings':
             cell = self.sheet.range(cell_range)
             cell.value = value
-            cell.api.Font.Name = "Times New Roman"  # Set font in xlwings         
         else:
-            # For openpyxl, handle merged cells properly             
-            cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range                  
+            # For openpyxl, handle merged cells properly
+            cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
     
+            # Check if the cell is part of a merged range using openpyxl's merged_cells method
             is_merged = False
-            cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')                               
+            cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')
+            
     
             for merged_range in self.sheet.merged_cells.ranges:
                 if cell_coord in merged_range:
@@ -69,21 +69,18 @@ class ExcelModifier:
                     break
     
             if is_merged:
-                # If the cell is merged, modify the top-left cell of the merged range                 
+                # If the cell is merged, modify the top-left cell of the merged range
                 for merged_range in self.sheet.merged_cells.ranges:
                     if cell_coord in merged_range:
                         top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
                         top_left_cell.value = value
-                        top_left_cell.font = Font(name="Times New Roman")  # Set font                         
                         break
             else:
-                # Modify the original cell if it's not part of a merged range                 
+                # Modify the original cell if it's not part of a merged range
                 cell.value = value
-                cell.font = Font(name="Times New Roman")  # Set font                       
-    
-        print(f"Cell {cell_range} updated to {value} with Times New Roman font.")
-    
-    
+                
+        print(f"Cell {cell_range} updated to {value}.")
+
     def auto_fit_columns(self):
         """Automatically adjusts all columns to fit content."""
         if self.sheet is None:
