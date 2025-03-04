@@ -1,5 +1,6 @@
 import calendar
 import json
+import locale
 import os
 import re
 from datetime import datetime, timedelta
@@ -168,8 +169,16 @@ def print_cost_cover(project_id, url):
             end_date_obj = datetime.strptime(payment["endDate"], "%Y-%m-%d")
             
             # Format both dates
-            first_date = start_date_obj.strftime("%d %B %Y")  # Example: "01 March 2025"
+            # first_date = start_date_obj.strftime("%d %B %Y")  # Example: "01 March 2025"
+            # last_date = end_date_obj.strftime("%d %B %Y")
+
+            locale.setlocale(locale.LC_TIME, "ar_EG.utf8")
+            
+            first_date = start_date_obj.strftime("%d %B %Y")  
             last_date = end_date_obj.strftime("%d %B %Y")
+            
+            
+            
             
             
             
@@ -187,7 +196,7 @@ def print_cost_cover(project_id, url):
             excel_modifier.modify_cell("D2", title)
             excel_modifier.modify_cell("E4", subtitle)
             excel_modifier.modify_cell("C7", first_date)
-            excel_modifier.modify_cell("F6", "11/11/11")
+            excel_modifier.modify_cell("F6", last_date)
             excel_modifier.modify_cell("C44", payment_gary_number )
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
             modify_cell_with_null_check(excel_modifier, letter, "13", new_item)
