@@ -202,7 +202,7 @@ def print_cost_cover(project_id, url):
             subtitle = f"مستخلص جاري رقم ({payment_gary_number}) "
             excel_modifier.modify_cell("D2", title)
             excel_modifier.modify_cell("E4", subtitle)
-            excel_modifier.modify_cell("C7", first_date)
+            excel_modifier.modify_cell("C6", first_date)
             excel_modifier.modify_cell("F6", last_date)
             excel_modifier.modify_cell("C44", payment_gary_number )
             modify_cell_with_null_check(excel_modifier, letter, "10", payment.get("originalAmount"))
