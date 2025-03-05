@@ -94,7 +94,7 @@ def print_cost_cover(project_id, url):
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
 
-        test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items", params={"associationId": f"{association_Id}"})
+        test = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values", params={"associationId": f"{association_Id}"})
         pretty_print_json(test)
         
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
