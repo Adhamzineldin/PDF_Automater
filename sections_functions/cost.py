@@ -108,10 +108,10 @@ def print_cost_cover(project_id, url):
         inf_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("INF" in item["number"])]
         rem_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("REM" in item["number"])]
         
-        new_item = sum([item["amount"] for item in payment_items if (item["parentId"] in nic_change_orders_ids) ])
-        similar_item = sum([item["amount"] for item in payment_items if (item["parentId"] in sic_change_orders_ids) ])
-        inflation_rate = sum([item["amount"] for item in payment_items if (item["parentId"] in inf_change_orders_ids)])
-        remeasured = sum([item["amount"] for item in payment_items if (item["parentId"] in rem_change_orders_ids)])
+        new_item = sum([ float(item["amount"]) for item in payment_items if (item["parentId"] in nic_change_orders_ids) ])
+        similar_item = sum([ float(item["amount"]) for item in payment_items if (item["parentId"] in sic_change_orders_ids) ])
+        inflation_rate = sum([ float(item["amount"]) for item in payment_items if (item["parentId"] in inf_change_orders_ids)])
+        remeasured = sum([ float(item["amount"]) for item in payment_items if (item["parentId"] in rem_change_orders_ids)])
         
 
 
