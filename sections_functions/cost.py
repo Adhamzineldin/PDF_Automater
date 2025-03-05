@@ -50,6 +50,8 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
+    test = acc_api.call_api(f"cost/v1/containers/{project_id}/change-orders")
+    pretty_print_json(test)
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
     # pretty_print_json(sov_response)
 
