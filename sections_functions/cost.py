@@ -103,13 +103,15 @@ def print_cost_cover(project_id, url):
                 }
         )["results"]
 
-        change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
-
-        new_item = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("NIC" in item["number"])])
-        print([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids)])
-        similar_item = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("SIC" in item["number"])])
-        inflation_rate = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("INF" in item["number"])])
-        remeasured = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("REM" in item["number"])])
+        nic_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("NIC" in item["number"])]
+        sic_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("SIC" in item["number"])]
+        inf_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("INF" in item["number"])]
+        rem_change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO" and ("REM" in item["number"])]
+        
+        new_item = sum([item["amount"] for item in payment_items if (item["parentId"] in nic_change_orders_ids) ])
+        similar_item = sum([item["amount"] for item in payment_items if (item["parentId"] in sic_change_orders_ids) ])
+        inflation_rate = sum([item["amount"] for item in payment_items if (item["parentId"] in inf_change_orders_ids)])
+        remeasured = sum([item["amount"] for item in payment_items if (item["parentId"] in rem_change_orders_ids)])
         
 
 
