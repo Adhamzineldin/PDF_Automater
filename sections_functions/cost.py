@@ -104,6 +104,7 @@ def print_cost_cover(project_id, url):
         )["results"]
 
         change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
+        print(f"Change Orders IDs: {change_orders_ids}")
 
         new_item = sum([
                 item.get("amount", 0) for item in items
