@@ -91,15 +91,8 @@ def print_cost_cover(project_id, url):
         association_Id = payment["associationId"]
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
-        # similar_item = 0
-        # new_item = 0
-        # for item in items:
-        #     if item["name"] == "Block Work":
-        #         if item["estimated"]:
-        #             similar_item += float(item["estimated"])
-        #     else:
-        #         if item["estimated"]:
-        #             new_item += float(item["estimated"])
+        for item in items:
+            pretty_print_json(item)
 
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "NIC" and "estimated" in item and item["estimated"] is not None])
         similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "SIC" and "estimated" in item and item["estimated"] is not None])
