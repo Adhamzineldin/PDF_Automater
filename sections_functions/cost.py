@@ -107,22 +107,22 @@ def print_cost_cover(project_id, url):
         print(f"Change Orders IDs: {change_orders_ids}")
 
         new_item = sum([
-                item.get("amount", 0) for item in items
+                item.get("amount", 0) for item in payment_items
                 if item.get("parentId") in change_orders_ids and "NIC" in item.get("number", "")
         ])
 
         similar_item = sum([
-                item.get("amount", 0) for item in items
+                item.get("amount", 0) for item in payment_items
                 if item.get("parentId") in change_orders_ids and "SIC" in item.get("number", "")
         ])
         
         inflation_rate = sum([
-                item.get("amount", 0) for item in items
+                item.get("amount", 0) for item in payment_items
                 if item.get("parentId") in change_orders_ids and "INF" in item.get("number", "")
         ])
         
         remeasured = sum([
-                item.get("amount", 0) for item in items
+                item.get("amount", 0) for item in payment_items
                 if item.get("parentId") in change_orders_ids and "REM" in item.get("number", "")
         ])
 
