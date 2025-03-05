@@ -101,7 +101,7 @@ def print_cost_cover(project_id, url):
                 params={
                         "paymentId": payment_number
                 }
-        )
+        )["results"]
 
         change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
 
