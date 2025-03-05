@@ -83,7 +83,7 @@ def print_cost_cover(project_id, url):
     print(f"cost id is {cost_id}")
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
-    pretty_print_json(change_orders)
+    # pretty_print_json(change_orders)
 
    
     
@@ -102,7 +102,7 @@ def print_cost_cover(project_id, url):
                 }
         )
 
-        # pretty_print_json(test)
+        pretty_print_json(test)
         
         
         
