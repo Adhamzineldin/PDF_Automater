@@ -98,7 +98,7 @@ def print_cost_cover(project_id, url):
                 params={
                         "paymentId": payment_number,
                         "type": "NIC",  # Replace with "REM", "ETC", etc.
-                        "updatedAt": "asc"
+                        "updatedAt": "desc"
                 }
         )
 
