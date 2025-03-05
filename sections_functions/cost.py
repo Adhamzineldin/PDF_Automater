@@ -94,13 +94,16 @@ def print_cost_cover(project_id, url):
         items = [item for item in change_orders if item["contractId"] == association_Id]
 
         test = acc_api.call_api(
-                f"cost/v1/containers/{project_id}/cost-items",
+                f"cost/v1/containers/{project_id}/change-orders",
                 params={
-                        "changeOrderId": "e80820d0-7341-11ef-ac3c-93fe2d40c1d6"  # Filter cost items by a specific Change Order ID
+                        "type": "NIC"  # Replace with "REM", "ETC", etc.
                 }
         )
-        
+
         pretty_print_json(test)
+        
+        
+        
         
         
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
