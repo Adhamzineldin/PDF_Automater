@@ -106,24 +106,25 @@ def print_cost_cover(project_id, url):
         change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
 
         new_item = sum([
-                item["amount"] for item in items
-                if item["parentId"] is not None and item["parentId"] in change_orders_ids and "NIC" in item["number"]
+                item.get("amount", 0) for item in items
+                if item.get("parentId") in change_orders_ids and "NIC" in item.get("number", "")
         ])
 
         similar_item = sum([
-                item["amount"] for item in items
-                if item["parentId"] is not None and item["parentId"] in change_orders_ids and "SIC" in item["number"]
+                item.get("amount", 0) for item in items
+                if item.get("parentId") in change_orders_ids and "SIC" in item.get("number", "")
         ])
         
         inflation_rate = sum([
-                item["amount"] for item in items
-                if item["parentId"] is not None and item["parentId"] in change_orders_ids and "INF" in item["number"]
+                item.get("amount", 0) for item in items
+                if item.get("parentId") in change_orders_ids and "INF" in item.get("number", "")
         ])
         
         remeasured = sum([
-                item["amount"] for item in items
-                if item["parentId"] is not None and item["parentId"] in change_orders_ids and "REM" in item["number"]
+                item.get("amount", 0) for item in items
+                if item.get("parentId") in change_orders_ids and "REM" in item.get("number", "")
         ])
+
 
 
 
