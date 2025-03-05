@@ -91,16 +91,18 @@ def print_cost_cover(project_id, url):
         association_Id = payment["associationId"]
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
-        similar_item = 0
-        new_item = 0
-        for item in items:
-            if item["name"] == "Block Work":
-                if item["estimated"]:
-                    similar_item += float(item["estimated"])
-            else:
-                if item["estimated"]:
-                    new_item += float(item["estimated"])
+        # similar_item = 0
+        # new_item = 0
+        # for item in items:
+        #     if item["name"] == "Block Work":
+        #         if item["estimated"]:
+        #             similar_item += float(item["estimated"])
+        #     else:
+        #         if item["estimated"]:
+        #             new_item += float(item["estimated"])
 
+        new_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "NIC" and "estimated" in item and item["estimated"] is not None])
+        similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "SIC" and "estimated" in item and item["estimated"] is not None])
         inflation_rate = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "INF" and "estimated" in item and item["estimated"] is not None])
         remeasured = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "REM" and "estimated" in item and item["estimated"] is not None])
 
