@@ -51,6 +51,7 @@ def print_cost_cover(project_id, url):
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
+    
     # pretty_print_json(sov_response)
 
     # Initialize variables
@@ -93,26 +94,22 @@ def print_cost_cover(project_id, url):
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
 
-        test = acc_api.call_api(
+
+
+        payment_items = acc_api.call_api(
                 f"cost/v1/containers/{project_id}/payment-items",
                 params={
-                        "paymentId": payment_number,
-                        "type": "NIC"
-                
+                        "paymentId": payment_number
                 }
         )
 
-        pretty_print_json(test)
-        
-        
-        
-        
-        
-        new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
-        similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "SIC" and "estimated" in item and item["estimated"] is not None])
-        inflation_rate = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "INF" and "estimated" in item and item["estimated"] is not None])
-        remeasured = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "REM" and "estimated" in item and item["estimated"] is not None])
+        change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
 
+        new_item = sum([item["amount"] for item in items if (item["parentId"] in change_orders_ids) and ("NIC" in item["number"])])
+        similar_item = sum([item["amount"] for item in items if (item["parentId"] in change_orders_ids) and ("SIC" in item["number"])])
+        inflation_rate = sum([item["amount"] for item in items if (item["parentId"] in change_orders_ids) and ("INF" in item["number"])])
+        remeasured = sum([item["amount"] for item in items if (item["parentId"] in change_orders_ids) and ("REM" in item["number"])])
+        
 
 
         # Determine the template path based on association ID
