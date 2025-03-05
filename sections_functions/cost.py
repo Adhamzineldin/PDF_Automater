@@ -104,32 +104,15 @@ def print_cost_cover(project_id, url):
         )["results"]
 
         change_orders_ids = [item["id"] for item in payment_items if item["associationType"] == "SCO"]
-        print(f"Change Orders IDs: {change_orders_ids}")
 
-        new_item = sum([
-                item.get("amount", 0) for item in payment_items
-                if item.get("parentId") in change_orders_ids and "NIC" in item.get("number", "")
-        ])
-
-        similar_item = sum([
-                item.get("amount", 0) for item in payment_items
-                if item.get("parentId") in change_orders_ids and "SIC" in item.get("number", "")
-        ])
+        new_item = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("NIC" in item["number"])])
+        similar_item = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("SIC" in item["number"])])
+        inflation_rate = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("INF" in item["number"])])
+        remeasured = sum([item["amount"] for item in payment_items if (item["parentId"] in change_orders_ids) and ("REM" in item["number"])])
         
-        inflation_rate = sum([
-                item.get("amount", 0) for item in payment_items
-                if item.get("parentId") in change_orders_ids and "INF" in item.get("number", "")
-        ])
-        
-        remeasured = sum([
-                item.get("amount", 0) for item in payment_items
-                if item.get("parentId") in change_orders_ids and "REM" in item.get("number", "")
-        ])
 
 
-
-
-# Determine the template path based on association ID
+        # Determine the template path based on association ID
         template_filename = f"{payment_number}.xlsx"
         template_path = os.path.join("modified_files", template_filename)
         new = True
