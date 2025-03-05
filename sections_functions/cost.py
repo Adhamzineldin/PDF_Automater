@@ -50,8 +50,7 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
-    test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items")
-    pretty_print_json(test)
+    
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
     # pretty_print_json(sov_response)
 
@@ -86,13 +85,17 @@ def print_cost_cover(project_id, url):
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
     pretty_print_json(cost_payments)
-    
+
+   
     
     
     for payment in cost_payments:
         association_Id = payment["associationId"]
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
+
+        test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items", params={"associationId": f"{association_Id}"})
+        pretty_print_json(test)
         
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
         similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "SIC" and "estimated" in item and item["estimated"] is not None])
