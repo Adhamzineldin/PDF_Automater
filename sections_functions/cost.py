@@ -83,7 +83,7 @@ def print_cost_cover(project_id, url):
     print(f"cost id is {cost_id}")
     print(len(cost_payments))
     change_orders = [change_order for change_order in change_order_response if change_order["contractId"] in [cost_payment["associationId"] for cost_payment in cost_payments]]
-    pretty_print_json(cost_payments)
+    pretty_print_json(change_orders)
 
    
     
@@ -91,17 +91,8 @@ def print_cost_cover(project_id, url):
     for payment in cost_payments:
         association_Id = payment["associationId"]
         payment_number = payment["id"]
-        items = [item for item in change_orders if item["contractId"] == association_Id]
-
-        test = acc_api.call_api(
-                f"cost/v1/containers/{project_id}/properties",
-             
-        )
-
-        pretty_print_json(test)
-        
-        
-        
+        items = [item for item in change_orders if item["contractId"] == association_Id]   
+    
         
         
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
