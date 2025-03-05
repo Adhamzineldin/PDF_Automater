@@ -94,10 +94,10 @@ def print_cost_cover(project_id, url):
         for item in items:
             pretty_print_json(item)
 
-        new_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "NIC" and "estimated" in item and item["estimated"] is not None])
-        similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "SIC" and "estimated" in item and item["estimated"] is not None])
-        inflation_rate = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "INF" and "estimated" in item and item["estimated"] is not None])
-        remeasured = sum([item["estimated"] for item in items if item["splitNumber"]["type"] == "REM" and "estimated" in item and item["estimated"] is not None])
+        new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
+        similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "SIC" and "estimated" in item and item["estimated"] is not None])
+        inflation_rate = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "INF" and "estimated" in item and item["estimated"] is not None])
+        remeasured = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "REM" and "estimated" in item and item["estimated"] is not None])
 
 
 
