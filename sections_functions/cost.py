@@ -94,12 +94,8 @@ def print_cost_cover(project_id, url):
         items = [item for item in change_orders if item["contractId"] == association_Id]
 
         test = acc_api.call_api(
-                f"cost/v1/containers/{project_id}/payment-items",
-                params={
-                        "paymentId": payment_number,
-                        "type": "NIC",  # Replace with "REM", "ETC", etc.
-                        "updatedAt": "desc"
-                }
+                f"cost/v1/containers/{project_id}/properties",
+             
         )
 
         pretty_print_json(test)
