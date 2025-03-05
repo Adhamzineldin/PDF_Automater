@@ -50,7 +50,7 @@ def print_cost_cover(project_id, url):
 
     cost_payment_response = acc_api.call_api(f"cost/v1/containers/{project_id}/payments")["results"]
     change_order_response = acc_api.call_api(f"cost/v1/containers/{project_id}/cost-items")["results"]
-    test = acc_api.call_api(f"cost/v1/containers/{project_id}/change-orders")
+    test = acc_api.call_api(f"cost/v1/containers/{project_id}/payment-items")
     pretty_print_json(test)
     sov_response = acc_api.call_api(f"cost/v1/containers/{project_id}/schedule-of-values")["results"]
     # pretty_print_json(sov_response)
@@ -93,9 +93,7 @@ def print_cost_cover(project_id, url):
         association_Id = payment["associationId"]
         payment_number = payment["id"]
         items = [item for item in change_orders if item["contractId"] == association_Id]
-        for item in items:
-            pretty_print_json(item)
-
+        
         new_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "NIC" and "estimated" in item and item["estimated"] is not None])
         similar_item = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "SIC" and "estimated" in item and item["estimated"] is not None])
         inflation_rate = sum([item["estimated"] for item in items if item["splitNumber"]["prefix"] == "INF" and "estimated" in item and item["estimated"] is not None])
