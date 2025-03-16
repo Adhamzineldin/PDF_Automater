@@ -246,10 +246,10 @@ def print_cost_cover(project_id, url):
             
             
             # WINDOWS NONE PATH ERROR
-            if project:
-                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename='output.pdf', project_name=project["name"], folder_name="Cost Cover Sheets")
-            else:
-                print("Failed to upload PDF to ACC Because no project name")
+            # if project:
+            #     acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename='output.pdf', project_name=project["name"], folder_name="Cost Cover Sheets")
+            # else:
+            #     print("Failed to upload PDF to ACC Because no project name")
             
             print(f"FINAL PDF PATH: {pdf_path}")
             return pdf_path
