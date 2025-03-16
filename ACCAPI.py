@@ -516,7 +516,7 @@ class ACCAPI:
     
             try:
                 # Send the GET request to the API endpoint
-                response = requests.get(url, headers=headers, params=params)
+                response = requests.get(url, headers=headers, params=params, verify=False)
                 response.raise_for_status()  # Raise an exception for HTTP errors
                 return response.json()  # Return the raw JSON response from the API
             except requests.exceptions.HTTPError as http_err:
