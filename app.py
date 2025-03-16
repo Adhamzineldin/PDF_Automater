@@ -108,9 +108,13 @@ def process_request(data):
         # Save Excel file and export to PDF
         excel_modifier.save_workbook(filename='output.xlsx')
         pdf_path = excel_modifier.export_to_pdf(filename='output.pdf')
+        print(f"PDF file generated: {pdf_path}")
 
         # Return the generated PDF path
         return {"pdf_path": pdf_path, "status_code": 200}
+    except Exception as e:
+        print(f"Failed to process request: {str(e)}")
+        return {"error": f"Failed to process request: {str(e)}", "status_code": 500}
 
     finally:
         excel_modifier.close_workbook()
@@ -146,6 +150,9 @@ def generate_pdf():
     print("Response: ", response)
     if "pdf_path" in response:
         pdf_path = response["pdf_path"]
+        
+        print(pdf_path)
+        
         # if not pdf_path.endswith(".pdf"):
         #     pdf_path += ".pdf"
         # pdf_path = os.path.normpath(pdf_path)

@@ -219,6 +219,7 @@ class ExcelModifier:
                 pdf_path = pdf_path + ".pdf"  # xlwings doesn't add the extension
                 
                 print(f"PDF exported at {pdf_path}")
+                return pdf_path
             except Exception as e:
                 print(f"Error exporting to PDF: {e}")
                 return None
@@ -266,7 +267,7 @@ class ExcelModifier:
                 print(f"Error exporting to PDF via LibreOffice: {e}")
                 return None
     
-        return pdf_path
+        
 
 
     def export_to_pdf_no_upload(self, excel_filename="output"):
