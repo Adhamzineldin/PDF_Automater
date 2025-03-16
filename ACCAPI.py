@@ -56,7 +56,7 @@ class ACCAPI:
         }
 
         try:
-            response = requests.post(token_url, headers=headers, data=payload)
+            response = requests.post(token_url, headers=headers, data=payload, verify=False)
             response.raise_for_status()  # Raise an exception for HTTP errors
             data = response.json()
             access_token = data.get("access_token")
@@ -102,7 +102,7 @@ class ACCAPI:
         }
 
         try:
-            response = requests.post(token_url, headers=headers, data=payload)
+            response = requests.post(token_url, headers=headers, data=payload, verify=False)
             response.raise_for_status()  # Raise an exception for HTTP errors
             data = response.json()
             new_access_token = data.get("access_token")
