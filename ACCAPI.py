@@ -1,5 +1,7 @@
+import shutil
 import subprocess
 import time
+from collections import defaultdict
 
 from dotenv import load_dotenv
 from urllib.parse import urlencode
@@ -185,36 +187,66 @@ class ACCAPI:
             print(f"An error occurred while processing the SVG: {e}")
             return None
 
-    def upload_pdf_to_acc(self, pdf_path, excel_filename, project_name="Information Systems Workspace", folder_name="Adhams_Server"):
+    def upload_pdf_to_acc(self, pdf_path, filename, project_name="Information Systems Workspace", folder_name="Cost Cover Sheets"):
         """
         Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
     
         :param project_name: 
         :param folder_name: 
         :param pdf_path: The path to the generated PDF.
-        :param excel_filename: The filename to save the PDF as (without extension).
+        :param filename: The filename to save the PDF as (without extension).
         """
         # Get the user's home directory path
         home_dir = os.path.expanduser("~")
+
+       
     
         # Define the new PDF path
-        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{excel_filename}.pdf')
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename.split('_')[0]}/{filename}.pdf')
+    
+    
+        server_folder_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}')
     
         # Save the current working directory to return to it later
         original_dir = os.getcwd()
+
     
         # Ensure the target directory exists, if not, create it
         project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
         adham_server_dir = os.path.dirname(new_pdf_path)
-        if not os.path.exists(adham_server_dir):
+        
+        if not os.path.exists(project_files_dir):
+            print("Syncing Project Files directory...")
             os.makedirs(adham_server_dir)
             print(f"Directory {adham_server_dir} created.")
 
             # Change the current working directory to the folder containing the PDF
-            os.chdir(f'server/odrive/Autodesk/Square Engineering Firm')
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm'))
             # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
-            find_command = f"find {project_files_dir} -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;"
-            # subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+
+            find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)    
+        elif not os.path.exists(adham_server_dir):
+            print("Syncing Adham Server directory...")
+            
+            os.makedirs(adham_server_dir)
+
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+            
+            
+            
+            find_command = f'find "{server_folder_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+            
             subprocess.run(find_command, shell=True, check=True)
             
             time.sleep(5)
@@ -238,60 +270,269 @@ class ACCAPI:
         # Change back to the original working directory
         os.chdir(original_dir)
         print(f"Changed back to the original working directory: {original_dir}")
+
+    def upload_equipment_pdf_to_acc(self, pdf_path, filename, project_name="Information Systems Workspace", folder_name="Cost Cover Sheets"):
+        """
+        Function to export the PDF to a specified location on the Autodesk Odrive and refresh the directory.
+    
+        :param project_name: 
+        :param folder_name: 
+        :param pdf_path: The path to the generated PDF.
+        :param filename: The filename to save the PDF as (without extension).
+        """
+        # Get the user's home directory path
+        home_dir = os.path.expanduser("~")
+
+
+
+        # Define the new PDF path
+        new_pdf_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}/{filename}.pdf')
+
+
+        server_folder_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}')
+
+        # Save the current working directory to return to it later
+        original_dir = os.getcwd()
+
+        pdf_path = os.path.join(original_dir, f"modified_files/{filename}.pdf")
+
+        # Ensure the target directory exists, if not, create it
+        project_files_dir = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}')
+        adham_server_dir = os.path.dirname(new_pdf_path)
+
+        if not os.path.exists(project_files_dir):
+            print("Syncing Project Files directory...")
+            os.makedirs(adham_server_dir)
+            print(f"Directory {adham_server_dir} created.")
+
+            # Change the current working directory to the folder containing the PDF
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+
+            find_command = f'find "{project_files_dir}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)
+        elif not os.path.exists(adham_server_dir):
+            print("Syncing Adham Server directory...")
+
+            os.makedirs(adham_server_dir)
+
+            os.chdir(os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/{folder_name}'))
+            # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+            subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+            os.chdir(project_files_dir)
+
+
+
+            find_command = f'find "{server_folder_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;;'
+
+            subprocess.run(find_command, shell=True, check=True)
+
+            time.sleep(5)
+
+
+        # If the output file already exists, delete it to avoid conflicts
+        if os.path.exists(new_pdf_path):
+            os.remove(new_pdf_path)
+
+        # Use the 'cp' command to copy the generated PDF to the new location
+        subprocess.run(['cp', pdf_path, new_pdf_path], check=True)
+
+        # Change the current working directory to the folder containing the PDF
+        os.chdir(adham_server_dir)
+
+        # Run the 'odrive refresh' command in the current directory (which is now pdf_dir)
+        subprocess.run([os.path.expanduser("~/.odrive-agent/bin/odrive"), 'refresh', '.'], check=True)
+
+        print(f"PDF also exported at {new_pdf_path}")
+
+        # Change back to the original working directory
+        os.chdir(original_dir)
+        print(f"Changed back to the original working directory: {original_dir}")
+
+
+
+    def download_project_zips(self, project_name="Information Systems Workspace"):
+        """
+        Recursively syncs the entire Autodesk Odrive project, downloads all .zip.cloud files inside 'cloudf' folders,
+        and progressively copies them to the user's Downloads folder.
+        
+        :param project_name: The name of the project to search for ZIP files.
+        :return: List of downloaded .zip file paths.
+        """
+        home_dir = os.path.expanduser("~")
+        project_path = os.path.join(home_dir, f'server/odrive/Autodesk/Square Engineering Firm/{project_name}/Project Files/Adhams_Server')
+        download_path = os.path.join(home_dir, 'Downloads')
+    
+        if not os.path.exists(project_path):
+            return {"error": f"Project '{project_name}' not found.", "status_code": 404}
+    
+        # Step 1: Recursively sync everything in the drive
+        full_sync_command = f'find "{project_path}" -type d -exec ~/.odrive-agent/bin/odrive refresh {{}} \\;'
+        subprocess.run(full_sync_command, shell=True, check=True)
+    
+        # Step 2: Find and sync .zip.cloud files inside "cloudf" folders
+        find_cloud_zip_command = f'find "{project_path}" -type f -name "*.zip.cloud"'
+        result = subprocess.run(find_cloud_zip_command, shell=True, capture_output=True, text=True)
+        cloud_zip_files = result.stdout.strip().split("\n") if result.stdout else []
+    
+        for cloud_file in cloud_zip_files:
+            if not cloud_file.endswith(".zip.cloud"):
+                continue
+    
+            sync_command = f'~/.odrive-agent/bin/odrive sync "{cloud_file}"'
+            subprocess.run(sync_command, shell=True, check=True)
+    
+            # Wait for file to fully download
+            while os.path.exists(cloud_file):
+                time.sleep(2)
+    
+        # Step 3: Find all .zip files in the project directory
+        find_zip_command = f'find "{project_path}" -type f -name "*.zip"'
+        result = subprocess.run(find_zip_command, shell=True, capture_output=True, text=True)
+        zip_files = result.stdout.strip().split("\n") if result.stdout else []
+    
+        if not zip_files:
+            return {"error": "No ZIP files found in the project.", "status_code": 404}
+    
+        # Ensure the download folder exists
+        os.makedirs(download_path, exist_ok=True)
+    
+        downloaded_files = []
+        for zip_file in zip_files:
+            zip_filename = os.path.basename(zip_file)
+            local_zip_path = os.path.join(download_path, zip_filename)
+    
+            # 🟢 Use rsync instead of shutil.copy so user sees files while copying
+            rsync_command = f'rsync --progress "{zip_file}" "{local_zip_path}"'
+            subprocess.run(rsync_command, shell=True, check=True)
+    
+            downloaded_files.append(local_zip_path)
+    
+        return {"message": "ZIP files downloaded successfully.", "files": downloaded_files, "status_code": 200}  
+        
+        
+        
+        
         
         
 
     # Dynamic function to call any Autodesk API endpoint and return the unfiltered response
-    def call_api(self, endpoint, params=None):
-        # Load the refresh token
-        refresh_token = self.load_refresh_token()
 
-        # If no refresh token is found, prompt for authorization code
-        if not refresh_token:
-            print("No refresh token found. Please authenticate first.")
-            auth_url = self.get_authorization_url()
-            print(f"Visit this URL to authenticate and get the code: {auth_url}")
-            auth_code = input("Enter the authorization code: ")
-            access_token, refresh_token = self.get_access_token(auth_code)
-
-        # Attempt to refresh the token and get a valid access token
-        access_token, _ = self.refresh_access_token(refresh_token)  # Refresh token to get the access token
-
-        # If the refresh token failed, prompt for the initial authorization flow
-        if not access_token:
-            print("Refresh token expired or invalid. Please authenticate again.")
-            auth_url = self.get_authorization_url()
-            print(f"Visit this URL to authenticate and get the code: {auth_url}")
-            auth_code = input("Enter the authorization code: ")
-            access_token, refresh_token = self.get_access_token(auth_code)  # Re-authenticate
-            self.save_refresh_token(refresh_token)  # Save the new refresh token
-
-        # API call to the specified endpoint
-        url = f"{self.BASE_URL}/{endpoint}"
-        headers = {
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
+    def get_project_files(self, project_name="Information Systems Workspace", file_types=None):
+        """
+        Searches for all specified compressed files in the Autodesk Odrive project directory
+        without syncing or downloading them.
+    
+        :param project_name: The name of the project to search for compressed files.
+        :param file_types: List of file extensions to search for (e.g., ["zip", "rar", "7z"])
+        :return: Dictionary containing file paths relative to the project directory and file counts.
+        """
+        if file_types is None:
+            file_types = ["zip", "rar", "7z"]  # Default file types
+    
+        home_dir = os.path.expanduser("~")
+        base_path = os.path.join(home_dir, 'server/odrive/Autodesk/')
+        project_path = os.path.join(base_path, "Square Engineering Firm", project_name)
+    
+        if not os.path.exists(project_path):
+            return {"error": f"Project '{project_name}' not found.", "status_code": 404}
+    
+        # Build find command dynamically (case-insensitive)
+        find_conditions = " -o ".join([f'-iname "*.{ext}" -o -iname "*.{ext}.cloud"' for ext in file_types])
+        find_conditions += " -o " + " -o ".join([f'-iname "*.{ext.upper()}" -o -iname "*.{ext.upper()}.cloud"' for ext in file_types])
+    
+        find_compressed_command = f'find "{project_path}" -type f \\( {find_conditions} \\)'
+    
+        result = subprocess.run(find_compressed_command, shell=True, capture_output=True, text=True)
+        compressed_files = result.stdout.strip().split("\n") if result.stdout else []
+    
+        if not compressed_files or compressed_files == ['']:
+            return {"error": "No compressed files found in the project.", "status_code": 404}
+    
+        # Dictionary to store count of each file type
+        file_counts = defaultdict(int)
+        relative_files = []
+        print(f"Found {len(compressed_files)} compressed files in the project.")
+        for file in compressed_files:
+            rel_path = os.path.relpath(file, base_path)
+    
+            # Normalize file extensions (.cloud and uppercase handling)
+            for ext in file_types + [ext.upper() for ext in file_types]:
+                if rel_path.lower().endswith(f".{ext.lower()}.cloud"):
+                    rel_path = rel_path[:-(len(ext) + 6)] + f".{ext.lower()}"  # Replace .cloud
+                if rel_path.lower().endswith(f".{ext.lower()}"):
+                    file_counts[ext.lower()] += 1
+                    break  # Ensure each file is counted only once
+    
+            relative_files.append(rel_path)
+    
+        total_files = sum(file_counts.values())
+    
+        return {
+                "message": "Compressed files found successfully.",
+                "files": relative_files,
+                "count": total_files,
+                "file_counts": dict(file_counts),
+                "status_code": 200
         }
 
-        try:
-            # Send the GET request to the API endpoint
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()  # Raise an exception for HTTP errors
-            return response.json()  # Return the raw JSON response from the API
-        except requests.exceptions.HTTPError as http_err:
-            if response.status_code == 401:  # Unauthorized, typically means access token expired
-                print("Access token expired. Refreshing token and retrying...")
-                # Refresh the token and retry the request
-                access_token, refresh_token = self.refresh_access_token(refresh_token)
+    def call_api(self, endpoint, params=None):
+            # Load the refresh token
+            refresh_token = self.load_refresh_token()
+    
+            # If no refresh token is found, prompt for authorization code
+            if not refresh_token:
+                print("No refresh token found. Please authenticate first.")
+                auth_url = self.get_authorization_url()
+                print(f"Visit this URL to authenticate and get the code: {auth_url}")
+                auth_code = input("Enter the authorization code: ")
+                access_token, refresh_token = self.get_access_token(auth_code)
+    
+            # Attempt to refresh the token and get a valid access token
+            access_token, _ = self.refresh_access_token(refresh_token)  # Refresh token to get the access token
+    
+            # If the refresh token failed, prompt for the initial authorization flow
+            if not access_token:
+                print("Refresh token expired or invalid. Please authenticate again.")
+                auth_url = self.get_authorization_url()
+                print(f"Visit this URL to authenticate and get the code: {auth_url}")
+                auth_code = input("Enter the authorization code: ")
+                access_token, refresh_token = self.get_access_token(auth_code)  # Re-authenticate
                 self.save_refresh_token(refresh_token)  # Save the new refresh token
-                return self.call_api(endpoint, params)  # Retry the API call with the new token
-            else:
-                print(f"HTTP error occurred: {http_err}")
-                print("Response content:", response.content.decode())
+    
+            # API call to the specified endpoint
+            url = f"{self.BASE_URL}/{endpoint}"
+            headers = {
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+            }
+    
+            try:
+                # Send the GET request to the API endpoint
+                response = requests.get(url, headers=headers, params=params)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                return response.json()  # Return the raw JSON response from the API
+            except requests.exceptions.HTTPError as http_err:
+                if response.status_code == 401:  # Unauthorized, typically means access token expired
+                    print("Access token expired. Refreshing token and retrying...")
+                    # Refresh the token and retry the request
+                    access_token, refresh_token = self.refresh_access_token(refresh_token)
+                    self.save_refresh_token(refresh_token)  # Save the new refresh token
+                    return self.call_api(endpoint, params)  # Retry the API call with the new token
+                else:
+                    print(f"HTTP error occurred: {http_err}")
+                    print("Response content:", response.content.decode())
+                    raise
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
                 raise
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-            raise
 
 # Main workflow
 def main():

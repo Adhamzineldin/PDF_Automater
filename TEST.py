@@ -1,58 +1,78 @@
-import json
-from datetime import datetime
-from ACCAPI import ACCAPI
-from ExcelModifier import ExcelModifier
+import requests
+import ACCAPI
+
+accapi = ACCAPI.ACCAPI()
+
+# Step 1: Get the first Hub ID
+def get_hub_id():
+    url = "project/v1/hubs"
+    response = accapi.call_api(url)
+
+    if response and "data" in response and len(response["data"]) > 0:
+        hub_id = response["data"][0].get("id")  # Use .get() to avoid KeyError
+        if hub_id:
+            print(f"Hub ID: {hub_id}")
+            return hub_id
+    print("No hubs found.")
+    return None
+
+# Step 2: Get all projects in the hub
+def get_projects(hub_id):
+    url = f"project/v1/hubs/{hub_id}/projects"
+    response = accapi.call_api(url)
+
+    if response and "data" in response:
+        projects = response["data"]
+        print(f"Found {len(projects)} projects.")
+        return projects
+    else:
+        print("No projects found.")
+        return []
+
+# Step 3: Get top-level folders in the project (using the correct endpoint with hub_id)
+def get_top_folders(hub_id, project_id):
+    url = f"project/v1/hubs/{hub_id}/projects/{project_id}/topFolders"  # Correct endpoint with hub_id
+    response = accapi.call_api(url)
+
+    if response and "data" in response:
+        folders = response["data"]
+        if len(folders) == 0:
+            print(f"No top-level folders found for project {project_id}.")
+        for folder in folders:
+            folder_name = folder["attributes"].get("name", "Unknown Folder")  # Use .get() to avoid KeyError
+            folder_id = folder.get("id", "Unknown ID")  # Default to Unknown if ID is not found
+            print(f"📂 Folder: {folder_name} ({folder_id})")
+            list_folder_contents(project_id, folder_id)
+    else:
+        print(f"No top-level folders found for project {project_id}.")
+
+# Step 4: List contents of each folder (files and subfolders)
+def list_folder_contents(project_id, folder_id):
+    url = f"data/v1/projects/{project_id}/folders/{folder_id}/contents"
+    response = accapi.call_api(url)
+
+    if response and "data" in response:
+        for item in response["data"]:
+            # print(f"📄 {item}")
+            # Try to get displayName first, then fall back to name
+            item_name = item["attributes"].get("displayName", item["attributes"].get("name", "Unnamed Item"))
+            item_type = item.get("type", "Unknown Type")  # Default to Unknown Type if not found
+            print(f"   - {item_type}: {item_name}")
+    
+            if item_type == "folders":
+                list_folder_contents(project_id, item.get("id", "Unknown ID"))  # Recursively handle subfolders
+    else:
+        print(f"No contents found in folder {folder_id}.")
 
 
-def pretty_print_json(data):
-    print(json.dumps(data, indent=4, ensure_ascii=False))
-
-def print_cost_cover():
-    acc_api = ACCAPI()
-    
-    cost_payment_response = acc_api.call_api(f"cost/v1/containers/1552c7dd-9709-4ed4-847d-915050067558/payments")["results"]
-    change_order_response = acc_api.call_api(f"cost/v1/containers/1552c7dd-9709-4ed4-847d-915050067558/cost-items")["results"]
-    
-    
-    cost_payments = [
-            cost_payment for cost_payment in cost_payment_response
-            if cost_payment["associationType"] == "Contract"
-               and datetime.strptime(cost_payment["endDate"], "%Y-%m-%d").strftime("%Y-%m") == datetime.now().strftime("%Y-%m")
-    ]
-    
-    change_order = [ change_order for change_order in change_order_response if change_order["contractId"] in [ cost_payment["associationId"] for cost_payment in cost_payments ] ]
-    
-    for payment in cost_payments:
-        association_Id = payment["associationId"]
-        items = [ item for item in change_order if item["contractId"] == association_Id ]
-        similar_item = 0
-        new_item = 0
-        for item in items:
-            if item["name"] == "Block Work":
-                similar_item += float(item["estimated"])
-            else:
-                new_item += float(item["estimated"])
-    
-        
-        excel_modifier = ExcelModifier(template_filename="templates/template.xlsx", modified_folder="modified_files")
-        try:
-            excel_modifier.open_workbook()
-            pretty_print_json(payment)
-            excel_modifier.modify_cell("D10", float(payment["originalAmount"]))
-            excel_modifier.modify_cell("D13", new_item)
-            excel_modifier.modify_cell("D14", similar_item)
-            # excel_modifier.modify_cell("D14", similar_item)
+# Main Execution
+hub_id = get_hub_id()
+if hub_id:
+    projects = get_projects(hub_id)
+    for project in projects:
+        project_id = project.get("id", "Unknown ID")  # Handle missing project ID
+        project_name = project["attributes"].get("name", "Unnamed Project")  # Handle missing project name
+        print(f"\n🛠️ Project: {project_name} ({project_id})")
+        if project_name == "Sample Project - Seaport Civic Center":
             
-            excel_modifier.save_workbook(filename='output.xlsx')
-            pdf_path = excel_modifier.export_to_pdf(filename='output.pdf')
-    
-            # Return the generated PDF path
-            return pdf_path
-    
-        finally:
-            excel_modifier.close_workbook()
-    
-              
-
-
-print_cost_cover()
+            get_top_folders(hub_id, project_id)  # Pass both hub_id and project_id

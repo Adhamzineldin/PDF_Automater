@@ -1,10 +1,14 @@
 import json
 import re
 import os
+import tempfile
 import threading
 import queue
-from flask import Flask, request, send_file, jsonify
+import zipfile
+
+from flask import Flask, request, send_file, jsonify, Response
 from ACCAPI import ACCAPI
+from ACC_Smart_Forms import generate_smart_form
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
 
@@ -28,6 +32,8 @@ def process_request(data):
     url = data.get('url')
     if not url:
         return {"error": "URL not provided", "status_code": 400}
+    
+    print(f"Processing request for URL: {url}")
 
     # Extract Project ID using regex
     project_id = None
@@ -83,7 +89,7 @@ def process_request(data):
         elif section == "Costs":
             print("Costs section")
             from sections_functions.cost import print_cost_cover
-            pdf_path = print_cost_cover(project_id)
+            pdf_path = print_cost_cover(project_id=project_id, url=url)
             return {"pdf_path": pdf_path, "status_code": 200}
 
         elif section == "Forms":
@@ -109,7 +115,6 @@ def process_request(data):
     finally:
         excel_modifier.close_workbook()
 
-
 def worker():
     """Background thread that processes requests from the queue."""
     while True:
@@ -123,7 +128,6 @@ def worker():
                 response_queue.put({"error": str(e), "status_code": 500})
             finally:
                 request_queue.task_done()
-
 
 @app.route('/generate-pdf', methods=['POST'])
 def generate_pdf():
@@ -139,14 +143,26 @@ def generate_pdf():
     response = response_queue.get()
 
     # Send the PDF file if processing is successful
+    print("Response: ", response)
     if "pdf_path" in response:
         pdf_path = response["pdf_path"]
+        # if not pdf_path.endswith(".pdf"):
+        #     pdf_path += ".pdf"
+        # pdf_path = os.path.normpath(pdf_path)
+
         if os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name="output.pdf", mimetype="application/pdf")
         else:
             return jsonify({"error": "PDF generation failed."}), 500
     else:
         return jsonify({"error": response.get("error", "Unknown error")}), response.get("status_code", 500)
+
+
+@app.route('/generate-equipment-form', methods=['GET'])
+def generate_equipment_form():
+    smart_form_object = generate_smart_form()
+    
+    return "Equipment form generated successfully! Might take a while to reflect in the ACC."
 
 
 

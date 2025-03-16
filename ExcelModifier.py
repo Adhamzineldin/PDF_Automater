@@ -2,8 +2,9 @@ import os
 import sys
 import subprocess
 import tempfile
+from collections.abc import Iterable
 
-
+from openpyxl.styles import Font, PatternFill, Border, Alignment
 from svgpathtools import svg2paths
 from PIL import Image, ImageDraw
 
@@ -54,10 +55,30 @@ class ExcelModifier:
             cell = self.sheet.range(cell_range)
             cell.value = value
         else:
-            # openpyxl accepts a single cell address; if a range is provided,
-            # we assume the top-left cell should be updated.
-            cell = self.sheet[cell_range.split(":")[0]]
-            cell.value = value
+            # For openpyxl, handle merged cells properly
+            cell = self.sheet[cell_range.split(":")[0]]  # Get the top-left cell of the range
+    
+            # Check if the cell is part of a merged range using openpyxl's merged_cells method
+            is_merged = False
+            cell_coord = cell.coordinate  # Get the coordinate of the cell (like 'A1')
+            
+    
+            for merged_range in self.sheet.merged_cells.ranges:
+                if cell_coord in merged_range:
+                    is_merged = True
+                    break
+    
+            if is_merged:
+                # If the cell is merged, modify the top-left cell of the merged range
+                for merged_range in self.sheet.merged_cells.ranges:
+                    if cell_coord in merged_range:
+                        top_left_cell = self.sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
+                        top_left_cell.value = value
+                        break
+            else:
+                # Modify the original cell if it's not part of a merged range
+                cell.value = value
+                
         print(f"Cell {cell_range} updated to {value}.")
 
     def auto_fit_columns(self):
@@ -109,6 +130,54 @@ class ExcelModifier:
                     cell.border = border
         print("Gridlines added to the sheet.")
 
+    # def insert_row(self, row):
+    #     """Inserts a new row using xlwings by shifting down rows manually."""
+    #     self.sheet.range(f"{row}:{row}").insert(shift="down")
+    #     print(f"Inserted a new row at {row}.")
+
+
+    def insert_row(self, row):
+        """Inserts a new row and copies styling from the row above."""
+
+        if self.backend == 'xlwings':
+            self.sheet.range(f"{row}:{row}").insert(shift="down")
+            print(f"Inserted a new row at {row}.")
+        else:
+            self.sheet.insert_rows(row)
+            
+            if row > 1:
+                for col in range(1, self.sheet.max_column + 1):
+                    cell_above = self.sheet.cell(row=row - 1, column=col)
+                    new_cell = self.sheet.cell(row=row, column=col)
+    
+                    if cell_above.has_style:
+                        new_cell.font = Font(
+                                name=cell_above.font.name,
+                                size=cell_above.font.size,
+                                bold=cell_above.font.bold,
+                                italic=cell_above.font.italic,
+                                underline=cell_above.font.underline,
+                                color=cell_above.font.color
+                        )
+                        new_cell.fill = PatternFill(
+                                fill_type=cell_above.fill.fill_type,
+                                start_color=cell_above.fill.start_color,
+                                end_color=cell_above.fill.end_color
+                        )
+                        new_cell.border = Border(
+                                left=cell_above.border.left,
+                                right=cell_above.border.right,
+                                top=cell_above.border.top,
+                                bottom=cell_above.border.bottom
+                        )
+                        new_cell.alignment = Alignment(
+                                horizontal=cell_above.alignment.horizontal,
+                                vertical=cell_above.alignment.vertical,
+                                wrap_text=cell_above.alignment.wrap_text
+                        )
+                        new_cell.number_format = cell_above.number_format
+
+
     def save_workbook(self, filename='modified.xlsx'):
         """Saves the workbook with a new name."""
         if self.workbook is None:
@@ -122,16 +191,22 @@ class ExcelModifier:
         print(f"Workbook saved at {save_path}")
         return save_path
 
-
-
-
-
-    def export_to_pdf(self, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Adhams_Server"):
+    def export_to_pdf(self, payment=None, filename='modified.pdf', excel_filename="output", project_name="Information Systems Workspace", destination_folder="Cost Cover Sheets"):
         """Exports the sheet to a PDF, fitting it to a single page."""
         if self.sheet is None:
             raise Exception("Workbook is not opened. Call open_workbook() first.")
+
+
+        name = None
+        if payment["number"]:
+            name = f'{payment["number"]}_{payment["status"]}'
+            print(name)
+        else:
+            name = f"{excel_filename}"
+            print(name)
     
-        pdf_path = os.path.join(self.modified_folder, filename)
+        pdf_path = os.path.join(self.modified_folder, name)
+        print(pdf_path)
     
         if self.backend == 'xlwings':
             # Windows-specific export using xlwings (unchanged)
@@ -141,6 +216,8 @@ class ExcelModifier:
             sheet_api.PageSetup.Zoom = False         # Disable zoom
             try:
                 sheet_api.ExportAsFixedFormat(0, pdf_path)  # 0 refers to xlTypePDF
+                pdf_path = pdf_path + ".pdf"  # xlwings doesn't add the extension
+                
                 print(f"PDF exported at {pdf_path}")
             except Exception as e:
                 print(f"Error exporting to PDF: {e}")
@@ -165,6 +242,7 @@ class ExcelModifier:
     
                 # Ensure that the generated PDF has the same name as the input XLSX file.
                 generated_pdf = os.path.join(self.modified_folder, f'{excel_filename}.pdf')
+                print(generated_pdf)
     
                 # If the output file already exists, delete it to avoid conflicts.
                 if os.path.exists(pdf_path):
@@ -175,8 +253,11 @@ class ExcelModifier:
                 print(f"PDF exported at {pdf_path}")
 
 
-                acc_api = ACCAPI()
-                acc_api.upload_pdf_to_acc(pdf_path=pdf_path, excel_filename=excel_filename, project_name=project_name, folder_name=destination_folder)
+                # acc_api = ACCAPI()
+                # 
+                # acc_api.upload_pdf_to_acc(pdf_path=pdf_path, filename=name, project_name=project_name, folder_name=destination_folder)
+                
+                return pdf_path
                 
                 
                 
@@ -186,7 +267,49 @@ class ExcelModifier:
                 return None
     
         return pdf_path
+
+
+    def export_to_pdf_no_upload(self, excel_filename="output"):
+        """Exports the sheet to a PDF, fitting it to a single page."""
+        if self.sheet is None:
+            raise Exception("Workbook is not opened. Call open_workbook() first.")
     
+        # Construct paths and ensure directory exists
+        modified_folder_path = "modified_files"
+        os.makedirs(modified_folder_path, exist_ok=True)
+    
+        temp_xlsx = os.path.join(modified_folder_path, f"{excel_filename}.xlsx")
+        if not os.path.exists(temp_xlsx):
+            print(f"Error: {temp_xlsx} does not exist.")
+            return None
+    
+        pdf_path = os.path.join(modified_folder_path, f"{excel_filename}.pdf")
+    
+        # Convert using LibreOffice
+        try:
+            cmd = [
+                    'libreoffice', '--headless',
+                    '--convert-to', 'pdf',
+                    '--outdir', self.modified_folder,
+                    temp_xlsx  # No quotes needed; subprocess handles spaces
+            ]
+            result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"LibreOffice stdout: {result.stdout.decode()}")
+            print(f"LibreOffice stderr: {result.stderr.decode()}")
+    
+            # Verify PDF was created
+            if not os.path.exists(pdf_path):
+                print(f"Error: PDF not generated at {pdf_path}")
+                return None
+    
+            print(f"PDF exported at {pdf_path}")
+            return pdf_path
+    
+        except subprocess.CalledProcessError as e:
+            print(f"LibreOffice conversion failed: {e.stderr.decode()}")
+            return None
+
+
     def insert_svg_as_image(self, svg_code, cell_range):
         """
         Converts SVG code to PNG using svgpathtools and Pillow, and inserts it into the Excel sheet.
