@@ -534,6 +534,57 @@ class ACCAPI:
                 print(f"An unexpected error occurred: {e}")
                 raise
 
+    def post_api(self, endpoint, json=None):
+        # Load the refresh token
+        refresh_token = self.load_refresh_token()
+
+        # If no refresh token is found, prompt for authorization code
+        if not refresh_token:
+            print("No refresh token found. Please authenticate first.")
+            auth_url = self.get_authorization_url()
+            print(f"Visit this URL to authenticate and get the code: {auth_url}")
+            auth_code = input("Enter the authorization code: ")
+            access_token, refresh_token = self.get_access_token(auth_code)
+
+        # Attempt to refresh the token and get a valid access token
+        access_token, _ = self.refresh_access_token(refresh_token)  # Refresh token to get the access token
+
+        # If the refresh token failed, prompt for the initial authorization flow
+        if not access_token:
+            print("Refresh token expired or invalid. Please authenticate again.")
+            auth_url = self.get_authorization_url()
+            print(f"Visit this URL to authenticate and get the code: {auth_url}")
+            auth_code = input("Enter the authorization code: ")
+            access_token, refresh_token = self.get_access_token(auth_code)  # Re-authenticate
+            self.save_refresh_token(refresh_token)  # Save the new refresh token
+
+        # API call to the specified endpoint
+        url = f"{self.BASE_URL}/{endpoint}"
+        headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+        }
+
+        try:
+            # Send the GET request to the API endpoint
+            response = requests.post(url, headers=headers, json=json, verify=False)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            return response.json()  # Return the raw JSON response from the API
+        except requests.exceptions.HTTPError as http_err:
+            if response.status_code == 401:  # Unauthorized, typically means access token expired
+                print("Access token expired. Refreshing token and retrying...")
+                # Refresh the token and retry the request
+                access_token, refresh_token = self.refresh_access_token(refresh_token)
+                self.save_refresh_token(refresh_token)  # Save the new refresh token
+                return self.post_api(endpoint, json)  # Retry the API call with the new token
+            else:
+                print(f"HTTP error occurred: {http_err}")
+                print("Response content:", response.content.decode())
+                raise
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            raise
+
 # Main workflow
 def main():
     try:
