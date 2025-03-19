@@ -1,14 +1,12 @@
 import json
 import re
 import os
-import tempfile
 import threading
 import queue
-import zipfile
 
-from flask import Flask, request, send_file, jsonify, Response
+from flask import Flask, request, send_file, jsonify
 from ACCAPI import ACCAPI
-from ACC_Smart_Forms import generate_smart_form
+from trash.ACC_Smart_Forms import generate_smart_form
 from ExcelModifier import ExcelModifier
 from flask_cors import CORS
 
